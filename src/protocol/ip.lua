@@ -4,11 +4,11 @@ ip.parse = function (buffer, offset)
 	local tmp_ip = {}
 
 	if type (buffer) ~= "string" then
-		error ("parameter 'buffer' is not a string (got " .. type (buffer) .. ")")
+		error ("parameter 'buffer' is not a string (got " .. type (buffer) .. ")", 2)
 	end
 
 	if type (offset) ~= "number" and type (offset) ~= "nil" then
-		error ("parameter 'offset' is not a number (got " .. type (offset) .. ")")
+		error ("parameter 'offset' is not a number (got " .. type (offset) .. ")", 2)
 	end
 
 	if offset then
