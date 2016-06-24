@@ -7,8 +7,8 @@ ip.parse = function (buffer, offset)
 		error ("parameter 'buffer' is not a string (got " .. type (buffer) .. ")")
 	end
 
-	if type (offset) ~= "number" then
-		error ("parameter 'offset' is not a number (got " .. type (buffer) .. ")")
+	if type (offset) ~= "number" and type (offset) ~= "nil" then
+		error ("parameter 'offset' is not a number (got " .. type (offset) .. ")")
 	end
 
 	if offset then

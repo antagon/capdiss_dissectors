@@ -1,9 +1,21 @@
 local eth = {}
 
-eth.parse = function (buffer)
+eth.parse = function (buffer, offset)
 	local tmp_eth = {}
 
-	tmp_eth.offset = 0
+	if type (buffer) ~= "string" then
+		error ("parameter 'buffer' is not a string (got " .. type (buffer) .. ")")
+	end
+
+	if type (offset) ~= "number" and type (offset) ~= "nil" then
+		error ("parameter 'offset' is not a number (got " .. type (offset) .. ")")
+	end
+
+	if offset then
+		tmp_eth.offset = offset
+	else
+		tmp_eth.offset = 0
+	end
 
 	tmp_eth.dst = string.format ("%02x:%02x:%02x:%02x:%02x:%02x",
 									buffer:byte (tmp_eth.offset + 1),
