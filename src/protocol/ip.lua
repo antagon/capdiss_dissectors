@@ -1,76 +1,77 @@
 local ip = {}
 
-ip.parse = function (buffer, offset)
+ip.parse = function (buffer, pos)
 	local tmp_ip = {}
+	local buff_pos = nil
 
 	if type (buffer) ~= "string" then
 		error ("parameter 'buffer' is not a string (got " .. type (buffer) .. ")", 2)
 	end
 
-	if type (offset) ~= "number" and type (offset) ~= "nil" then
-		error ("parameter 'offset' is not a number (got " .. type (offset) .. ")", 2)
+	if type (pos) ~= "number" and type (pos) ~= "nil" then
+		error ("parameter 'pos' is not a number (got " .. type (pos) .. ")", 2)
 	end
 
-	if offset then
-		tmp_ip.offset = offset
+	if pos then
+		buff_pos = pos
 	else
-		tmp_ip.offset = 0
+		buff_pos = 1
 	end
 
-	tmp_ip.version = ((buffer:byte (tmp_ip.offset + 1) & 0xF0) >> 4)
-	tmp_ip.hdr_len = ((buffer:byte (tmp_ip.offset + 1) & 0x0F) << 2)
+	tmp_ip.version = ((buffer:byte (buff_pos) & 0xF0) >> 4)
+	tmp_ip.hdr_len = ((buffer:byte (buff_pos) & 0x0F) << 2)
 
-	tmp_ip.offset = tmp_ip.offset + 1
+	buff_pos = buff_pos + 1
 
 	-- Skip 'differentiated services' byte
-	tmp_ip.offset = tmp_ip.offset + 1
+	buff_pos = buff_pos + 1
 
-	tmp_ip.tot_len = (buffer:byte (tmp_ip.offset + 1) << 8) | (buffer:byte (tmp_ip.offset + 2) & 0xFF)
+	tmp_ip.tot_len = (buffer:byte (buff_pos) << 8) | (buffer:byte (buff_pos + 1) & 0xFF)
 
-	tmp_ip.offset = tmp_ip.offset + 2
+	buff_pos = buff_pos + 2
 
-	tmp_ip.id = (buffer:byte (tmp_ip.offset + 1) << 8) | (buffer:byte (tmp_ip.offset + 2) & 0xFF)
+	tmp_ip.id = (buffer:byte (buff_pos) << 8) | (buffer:byte (buff_pos + 1) & 0xFF)
 
-	tmp_ip.offset = tmp_ip.offset + 2
+	buff_pos = buff_pos + 2
 
-	tmp_ip.flags = buffer:byte (tmp_ip.offset + 1)
+	tmp_ip.flags = buffer:byte (buff_pos)
 
-	-- Do not increment the offset, fragment offset begins at the same byte
-	--tmp_ip.offset = tmp_ip.offset + 1
+	-- Do not increment the pos, fragment pos begins at the same byte
+	--buff_pos = buff_pos + 1
 
-	tmp_ip.frag_off = (buffer:byte (tmp_ip.offset + 1) << 8) | (buffer:byte (tmp_ip.offset + 2) & 0xFF)
+	tmp_ip.frag_off = (buffer:byte (buff_pos) << 8) | (buffer:byte (buff_pos + 1) & 0xFF)
 
-	tmp_ip.offset = tmp_ip.offset + 2
+	buff_pos = buff_pos + 2
 
-	tmp_ip.ttl = buffer:byte (tmp_ip.offset + 1)
+	tmp_ip.ttl = buffer:byte (buff_pos)
 
-	tmp_ip.offset = tmp_ip.offset + 1
+	buff_pos = buff_pos + 1
 
-	tmp_ip.proto = buffer:byte (tmp_ip.offset + 1)
+	tmp_ip.proto = buffer:byte (buff_pos)
 
-	tmp_ip.offset = tmp_ip.offset + 1
+	buff_pos = buff_pos + 1
 
-	tmp_ip.checksum = (buffer:byte (tmp_ip.offset + 1) << 8) | (buffer:byte (tmp_ip.offset + 2) & 0xFF)
+	tmp_ip.checksum = (buffer:byte (buff_pos) << 8) | (buffer:byte (buff_pos + 1) & 0xFF)
 
-	tmp_ip.offset = tmp_ip.offset + 2
+	buff_pos = buff_pos + 2
 
 	tmp_ip.src = string.format ("%d.%d.%d.%d",
-									buffer:byte (tmp_ip.offset + 1),
-									buffer:byte (tmp_ip.offset + 2),
-									buffer:byte (tmp_ip.offset + 3),
-									buffer:byte (tmp_ip.offset + 4))
+									buffer:byte (buff_pos),
+									buffer:byte (buff_pos + 1),
+									buffer:byte (buff_pos + 2),
+									buffer:byte (buff_pos + 3))
 
-	tmp_ip.offset = tmp_ip.offset + 4
+	buff_pos = buff_pos + 4
 
 	tmp_ip.dst = string.format ("%d.%d.%d.%d",
-									buffer:byte (tmp_ip.offset + 1),
-									buffer:byte (tmp_ip.offset + 2),
-									buffer:byte (tmp_ip.offset + 3),
-									buffer:byte (tmp_ip.offset + 4))
+									buffer:byte (buff_pos),
+									buffer:byte (buff_pos + 1),
+									buffer:byte (buff_pos + 2),
+									buffer:byte (buff_pos + 3))
 
-	tmp_ip.offset = tmp_ip.offset + 4
+	buff_pos = buff_pos + 4
 
-	return tmp_ip
+	return tmp_ip, buff_pos
 end
 
 return ip

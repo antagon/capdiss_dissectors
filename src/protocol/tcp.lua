@@ -1,33 +1,34 @@
 local tcp = {}
 
-tcp.parse = function (buffer, offset)
+tcp.parse = function (buffer, pos)
 	local tmp_tcp = {}
+	local buff_pos = nil
 
 	if type (buffer) ~= "string" then
 		error ("parameter 'buffer' is not a string (got " .. type (buffer) .. ")", 2)
 	end
 
-	if type (offset) ~= "number" and type (offset) ~= "nil" then
-		error ("parameter 'offset' is not a number (got " .. type (offset) .. ")", 2)
+	if type (pos) ~= "number" and type (pos) ~= "nil" then
+		error ("parameter 'pos' is not a number (got " .. type (pos) .. ")", 2)
 	end
 
-	if offset then
-		tmp_tcp.offset = offset
+	if pos then
+		buff_pos = pos
 	else
-		tmp_tcp.offset = 0
+		buff_pos = 1
 	end
 
-	tmp_tcp.src = (buffer:byte (tmp_tcp.offset + 1) << 8) | (buffer:byte (tmp_tcp.offset + 2) & 0xFF)
+	tmp_tcp.src = (buffer:byte (buff_pos) << 8) | (buffer:byte (buff_pos + 1) & 0xFF)
 
-	tmp_tcp.offset = tmp_tcp.offset + 2
+	buff_pos = buff_pos + 2
 
-	tmp_tcp.dst = (buffer:byte (tmp_tcp.offset + 1) << 8) | (buffer:byte (tmp_tcp.offset + 2) & 0xFF)
+	tmp_tcp.dst = (buffer:byte (buff_pos) << 8) | (buffer:byte (buff_pos + 1) & 0xFF)
 
-	tmp_tcp.offset = tmp_tcp.offset + 2
+	buff_pos = buff_pos + 2
 
-	--tmp_tcp.seq = (buffer:byte (tmp_tcp.offset + 1) )
+	--tmp_tcp.seq = (buffer:byte (buff_pos + 1) )
 
-	return tmp_tcp
+	return tmp_tcp, buff_pos
 end
 
 return tcp
