@@ -1,7 +1,11 @@
 local eth = {}
 
-eth.parse = function (buffer, pos)
-	local tmp_eth = {}
+function eth.parse (buffer, pos)
+	local tmp_eth = {
+		PROTO_IP = 0x0800,
+		PROTO_ARP = 0x0806,
+		PROTO_IP6 = 0x86DD
+	}
 	local buff_pos = nil
 
 	if type (buffer) ~= "string" then
