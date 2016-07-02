@@ -19,9 +19,9 @@ dependencies = {
 build = {
 	type = "builtin",
 	modules = {
-		"eth" = "src/eth.lua",
-		"ip" = "src/ip.lua",
-		"tcp" = "src/tcp.lua"
+		eth = "src/eth.lua",
+		ip = "src/ip.lua",
+		tcp = "src/tcp.lua"
 	}
 }
 
