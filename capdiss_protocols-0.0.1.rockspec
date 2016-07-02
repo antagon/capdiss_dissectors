@@ -1,9 +1,9 @@
 package = "capdiss_protocols"
-version = "0.1.0-1"
+version = "0.0.1-1"
 
 source = {
 	url = "git://github.com/antagon/capdiss_protocols",
-	tag = "0.1.0"
+	tag = "0.0.1"
 }
 
 description = {
