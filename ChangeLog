@@ -1,0 +1,8 @@
+version 0.0.1
+-------------
+
+* Initial version release, not intended for use!
+
+* Supported protocols: eth, ip, tcp (returns invalid length of a tcp header,
+parser only tcp port numbers).
+
