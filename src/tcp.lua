@@ -53,6 +53,8 @@ tcp.parse = function (buffer, pos)
 
 	--tmp_tcp.seq = (buffer:byte (buff_pos + 1) )
 
+	-- FIXME: this script is incomplete!!!
+
 	return tmp_tcp, buff_pos
 end
 
