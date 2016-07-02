@@ -9,6 +9,7 @@ source = {
 description = {
 	summary = "Protocol dissectors for capdiss.",
 	homepage = "http://codeward.org/software/capdiss",
+	maintainer = "Dan Antagon <antagon@codeward.org>",
 	license = "MIT"
 }
 
