@@ -1,7 +1,11 @@
 local ip = {}
 
-ip.parse = function (buffer, pos)
-	local tmp_ip = {}
+function ip.parse (buffer, pos)
+	local tmp_ip = {
+		IPPROTO_ICMP = 0x01,
+		IPPROTO_TCP = 0x06,
+		IPPROTO_UDP = 0x11
+	}
 	local buff_pos = nil
 
 	if type (buffer) ~= "string" then
