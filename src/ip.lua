@@ -1,106 +1,129 @@
---[[
---
--- Parse IP header and return extracted information in a table.
---
--- Copyright (c) 2016, Dan Antagon <antagon@codeward.org>
---
--- Permission is hereby granted, free of charge, to any person obtaining a copy of
--- this software and associated documentation files (the "Software"), to deal in
--- the Software without restriction, including without limitation the rights to
--- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
--- of the Software, and to permit persons to whom the Software is furnished to do
--- so, subject to the following conditions:
---
--- The above copyright notice and this permission notice shall be included in all
--- copies or substantial portions of the Software.
-
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
--- SOFTWARE.
---]]
-
+local bit = require ("bit32")
+local stdint = require ("stdint")
 local ip = {}
 
-function ip.parse (buffer, pos)
-	local tmp_ip = {
-		IPPROTO_ICMP = 0x01,
-		IPPROTO_TCP = 0x06,
-		IPPROTO_UDP = 0x11
-	}
-	local buff_pos = nil
+-- TODO
+local function raw (buff, index, length)
+	if not index then index = 0 end
+	if not length then length = #buff - index end
 
-	if type (buffer) ~= "string" then
-		error ("parameter 'buffer' is not a string (got " .. type (buffer) .. ")", 2)
-	end
+	return string.char(string.byte(buff, index+1, index+1+length-1))
+end
 
-	if type (pos) ~= "number" and type (pos) ~= "nil" then
-		error ("parameter 'pos' is not a number (got " .. type (pos) .. ")", 2)
-	end
-
-	if pos then
-		buff_pos = pos
-	else
-		buff_pos = 1
-	end
-
-	tmp_ip.version = ((buffer:byte (buff_pos) & 0xF0) >> 4)
-	tmp_ip.hdr_len = ((buffer:byte (buff_pos) & 0x0F) << 2)
-
-	buff_pos = buff_pos + 1
-
-	-- Skip 'differentiated services' byte
-	buff_pos = buff_pos + 1
-
-	tmp_ip.tot_len = (buffer:byte (buff_pos) << 8) | (buffer:byte (buff_pos + 1) & 0xFF)
-
-	buff_pos = buff_pos + 2
-
-	tmp_ip.id = (buffer:byte (buff_pos) << 8) | (buffer:byte (buff_pos + 1) & 0xFF)
-
-	buff_pos = buff_pos + 2
-
-	tmp_ip.flags = buffer:byte (buff_pos)
-
-	-- Do not increment the pos, fragment pos begins at the same byte
-	--buff_pos = buff_pos + 1
-
-	tmp_ip.frag_off = (buffer:byte (buff_pos) << 8) | (buffer:byte (buff_pos + 1) & 0xFF)
-
-	buff_pos = buff_pos + 2
-
-	tmp_ip.ttl = buffer:byte (buff_pos)
-
-	buff_pos = buff_pos + 1
-
-	tmp_ip.proto = buffer:byte (buff_pos)
-
-	buff_pos = buff_pos + 1
-
-	tmp_ip.checksum = (buffer:byte (buff_pos) << 8) | (buffer:byte (buff_pos + 1) & 0xFF)
-
-	buff_pos = buff_pos + 2
-
-	tmp_ip.src = string.format ("%d.%d.%d.%d",
-									buffer:byte (buff_pos),
+local function ip_ntop ()
+	return ("%d.%d.%d.%d"):format (buffer:byte (buff_pos),
 									buffer:byte (buff_pos + 1),
 									buffer:byte (buff_pos + 2),
 									buffer:byte (buff_pos + 3))
+end
 
-	buff_pos = buff_pos + 4
+local function ip_parseopts (buff, offset, length)
+	local options = {}
+	local op = 1
+	local opt_ptr = 0
 
-	tmp_ip.dst = string.format ("%d.%d.%d.%d",
-									buffer:byte (buff_pos),
-									buffer:byte (buff_pos + 1),
-									buffer:byte (buff_pos + 2),
-									buffer:byte (buff_pos + 3))
+	while opt_ptr < length do
+		local t, l, d
+		options[op] = {}
 
-	buff_pos = buff_pos + 4
+		t = stdint.u8(buff, offset + opt_ptr)
+		options[op].type = t
 
-	return tmp_ip, buff_pos
+		if t==0 or t==1 then
+			l = 1
+			d = nil
+		else
+			l = stdint.u8(buff, offset + opt_ptr + 1)
+
+			if l > 2 then
+				d = raw(buff, offset + opt_ptr + 2, l-2)
+			end
+		end
+
+		options[op].len  = l
+		options[op].data = d
+		opt_ptr = opt_ptr + l
+		op = op + 1
+	end
+
+	return options
+end
+
+function ip.new (packet)
+	if type (packet) ~= "string" then
+		error ("parameter 'frame' is not a string", 2)
+	end
+
+	local ip_pkt = setmetatable ({}, { __index = ip })
+
+	ip_pkt.buff = packet
+
+	return ip_pkt
+end
+
+function ip:parse ()
+	if string.len (self.buff) < 20 then
+		self.errmsg = "incomplete IP header data"
+		return false
+	end
+
+	self.ip_offset = 0
+
+	self.ip_v = bit.rshift (bit.band (stdint.u8 (self.buff, self.ip_offset + 0), 0xF0), 4)
+	self.ip_hl = bit.band (stdint.u8 (self.buff, self.ip_offset + 0), 0x0F) -- header_length or data_offset
+
+	if self.ip_v ~= 4 then
+		self.errmsg = "not an IPv4 packet"
+		return false
+	end
+
+	self.ip_tos = stdint.u8 (self.buff, self.ip_offset + 1)
+	self.ip_len = stdint.u16 (self.buff, self.ip_offset + 2)
+	self.ip_id = stdint.u16 (self.buff, self.ip_offset + 4)
+	self.ip_off = stdint.u16 (self.buff, self.ip_offset + 6)
+	self.ip_rf = bit.band (self.ip_off, 0x8000) ~= 0 -- true/false
+	self.ip_df = bit.band (self.ip_off, 0x4000) ~= 0
+	self.ip_mf = bit.band (self.ip_off, 0x2000) ~= 0
+	self.ip_off = bit.band (self.ip_off, 0x1FFF) -- fragment offset
+	self.ip_ttl = stdint.u8 (self.buff, self.ip_offset + 8)
+	self.ip_p = stdint.u8 (self.buff, self.ip_offset + 9)
+	self.ip_sum = stdint.u16 (self.buff, self.ip_offset + 10)
+	self.ip_src = raw (self.buff, self.ip_offset + 12, 4) -- raw 4-bytes string
+	self.ip_dst = raw (self.buff, self.ip_offset + 16, 4)
+	self.ip_opt_offset = self.ip_offset + 20
+	self.ip_options = ip_parseopts (self.buff, self.ip_opt_offset, ((self.ip_hl * 4) - 20))
+	self.ip_data_offset = self.ip_offset + self.ip_hl * 4
+
+	return true
+end
+
+-- TODO
+function ip:get_rawpacket ()
+	return ""
+end
+
+function ip:set_packet (packet)
+	self.buff = packet
+end
+
+function ip:get_saddr ()
+	return ip_ntop (self.ip_src)
+end
+
+function ip:get_daddr ()
+	return ip_ntop (self.ip_dst)
+end
+
+function ip:get_rawsaddr ()
+	return self.ip_src
+end
+
+function ip:get_rawdaddr ()
+	return self.ip_dst
+end
+
+function ip:get_error ()
+	return self.errmsg
 end
 
 return ip
