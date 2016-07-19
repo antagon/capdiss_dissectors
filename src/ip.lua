@@ -1,4 +1,5 @@
 --- Internet protocol version 4 packet dissector.
+-- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
 -- @module ip
 
 local bit = require ("bit32")
@@ -77,7 +78,7 @@ end
 --- Parse the packet data.
 -- @treturn boolean True on success, false on failure (error message is set).
 -- @see ip.new
--- @see eth:set_packet
+-- @see ip:set_packet
 function ip:parse ()
 	if string.len (self.buff) < 20 then
 		self.errmsg = "incomplete IP header data"
@@ -154,14 +155,14 @@ function ip:get_rawdaddr ()
 	return self.ip_dst
 end
 
---- Get packet ID from the parsed content.
+--- Get IP packet's ID from the parsed content.
 -- @treturn integer Packet ID.
 function ip:get_id ()
 	return self.ip_id
 end
 
---- Get packet's TTL value from the parsed content.
--- @return integer packet TTL value
+--- Get IP packet's TTL value from the parsed content.
+-- @treturn integer Packet TTL value.
 function ip:get_ttl ()
 	return self.ip_ttl
 end
@@ -183,6 +184,18 @@ end
 -- @treturn integer Header length.
 function ip:get_hdrlen ()
 	return self.ip_hl
+end
+
+--- Get IP packet header checksum from the parsed content.
+-- @treturn integer Header checksum.
+function ip:get_hdrchecksum ()
+	return self.ip_sum
+end
+
+--- Get IP packet fragment offset from the parsed content.
+-- @treturn integer Fragment offset.
+function ip:get_fragoffset ()
+	return self.ip_off
 end
 
 --- Get last error message.
