@@ -1,4 +1,5 @@
 --- Ethernet II frame dissector.
+-- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
 -- @module eth
 
 local bstr = require ("bstr")

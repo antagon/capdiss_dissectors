@@ -38,7 +38,7 @@ local function tcp_parseopts (buff, offset, length)
 end
 
 --- Create a new object.
--- @tparam string packet pass packet data as an opaque string
+-- @tparam string packet byte string of packet data 
 -- @treturn table New tcp table.
 function tcp.new (packet)
 	if type (packet) ~= "string" then
@@ -52,6 +52,10 @@ function tcp.new (packet)
 	return tcp_pkt
 end
 
+--- Parse the packet data.
+-- @treturn boolean True on success, false on failure (error message is set).
+-- @see tcp.new
+-- @see tcp:set_packet
 function tcp:parse ()
 	if string.len (self.buff) < 20 then
 		self.errmsg = "incomplete TCP header data"
@@ -86,90 +90,128 @@ function tcp:parse ()
 	return true
 end
 
+--- Get data encapsulated in a packet.
+-- @treturn string Packet data or an empty string.
 function tcp:get_data ()
 	return string.sub (self.buff, self.tcp_hl + 1, -1)
 end
 
+--- Get length of data encapsulated in a packet.
+-- @treturn integer Data length.
 function tcp:get_datalen ()
 	return string.len (self.buff) - self.tcp_hl
 end
 
 --- Change or set new packet data.
--- @tparam string packet pass packet data as an opaque string
+-- @tparam string packet byte string of packet data
 function tcp:set_packet (packet)
 	self.buff = packet
 end
 
---- TODO
+--- Get packet's source port.
+-- @treturn integer Source port.
 function tcp:get_srcport ()
 	return self.tcp_sport
 end
 
---- TODO
+--- Get packet's destination port.
+-- @treturn integer Destination port.
 function tcp:get_dstport ()
 	return self.tcp_dport
 end
 
+--- Get packet's sequence number.
+-- @treturn integer Sequence number.
 function tcp:get_seqnum ()
 	return self.tcp_seq
 end
 
+--- Get packet's acknowledgment number.
+-- @treturn integer Acknowledgment number.
 function tcp:get_acknum ()
 	return self.tcp_ack
 end
 
+--- Get packet's header length.
+-- @treturn integer Header length.
 function tcp:get_hdrlen ()
 	return self.tcp_hl
 end
 
+--- Get packet's flags.
+-- @treturn table Flags.
 function tcp:get_flags ()
 	return self.tcp_th
 end
 
+--- Get packet's flags.
+-- @treturn integer Flags.
 function tcp:get_rawflags ()
 	return self.tcp_flags
 end
 
+--- Check if the FIN flag is set in a packet.
+-- @treturn boolean True if flag is set, otherwise False.
 function tcp:isset_fin ()
 	return self.tcp_th["fin"]
 end
 
+--- Check if the SYN flag is set in a packet.
+-- @treturn boolean True if flag is set, otherwise False.
 function tcp:isset_syn ()
 	return self.tcp_th["syn"]
 end
 
+--- Check if the RST flag is set in a packet.
+-- @treturn boolean True if flag is set, otherwise False.
 function tcp:isset_rst ()
 	return self.tcp_th["rst"]
 end
 
+--- Check if the PSH flag is set in a packet.
+-- @treturn boolean True if flag is set, otherwise False.
 function tcp:isset_push ()
 	return self.tcp_th["push"]
 end
 
+--- Check if the ACK flag is set in a packet.
+-- @treturn boolean True if flag is set, otherwise False.
 function tcp:isset_ack ()
 	return self.tcp_th["ack"]
 end
 
+--- Check if the URGENT flag is set in a packet.
+-- @treturn boolean True if flag is set, otherwise False.
 function tcp:isset_urg ()
 	return self.tcp_th["urg"]
 end
 
+--- Check if the ECHO flag is set in a packet.
+-- @treturn boolean True if flag is set, otherwise False.
 function tcp:isset_echo ()
 	return self.tcp_th["echo"]
 end
 
+--- Check if the CWR flag is set in a packet.
+-- @treturn boolean True if flag is set, otherwise False.
 function tcp:isset_cwr ()
 	return self.tcp_th["cwr"]
 end
 
+--- Get packet's window size.
+-- @treturn integer Window size.
 function tcp:get_winsize ()
 	return self.tcp_win
 end
 
+--- Get packet's checksum.
+-- @treturn integer Checksum.
 function tcp:get_checksum ()
 	return self.tcp_sum
 end
 
+--- Get packet's value of the urgent pointer.
+-- @treturn integer Urgent pointer.
 function tcp:get_urgpointer ()
 	return self.tcp_urgp
 end

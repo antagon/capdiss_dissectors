@@ -126,73 +126,73 @@ function ip:get_rawpacket ()
 end
 
 --- Change or set new packet data.
--- @tparam string packet pass packet data as an opaque string
+-- @tparam string packet byte string of packet data
 function ip:set_packet (packet)
 	self.buff = packet
 end
 
---- Get source IP address from the parsed content.
+--- Get packet's source IP address.
 -- @treturn string IP address formatted as XXX.XXX.XXX.XXX string.
 function ip:get_saddr ()
 	return ip_ntop (self.ip_src)
 end
 
---- Get destination IP address from the parsed content.
--- @treturn string IP address formatted as XXX.XXX.XXX.XXX string.
-function ip:get_daddr ()
-	return ip_ntop (self.ip_dst)
-end
-
---- Get source IP address from the parsed content.
+--- Get packet's source IP address.
 -- @treturn string Byte string representing an IP address.
 function ip:get_rawsaddr ()
 	return self.ip_src
 end
 
---- Get destination IP address from the parsed content.
+--- Get packet's destination IP address.
+-- @treturn string IP address formatted as XXX.XXX.XXX.XXX string.
+function ip:get_daddr ()
+	return ip_ntop (self.ip_dst)
+end
+
+--- Get packet's destination IP address.
 -- @treturn string Byte string representing an IP address.
 function ip:get_rawdaddr ()
 	return self.ip_dst
 end
 
---- Get IP packet's ID from the parsed content.
+--- Get packet's ID.
 -- @treturn integer Packet ID.
 function ip:get_id ()
 	return self.ip_id
 end
 
---- Get IP packet's TTL value from the parsed content.
+--- Get packet's TTL value.
 -- @treturn integer Packet TTL value.
 function ip:get_ttl ()
 	return self.ip_ttl
 end
 
---- Get IP protocol ID from the parsed content.
--- @treturn integer Value representing a type of encapsulated packet.
+--- Get packet's protocol ID.
+-- @treturn integer A value representing a type of encapsulated data.
 -- @see ip.type
 function ip:get_protocol ()
 	return self.ip_proto
 end
 
---- Get IP packet length from the parsed content.
+--- Get packet's length.
 -- @treturn integer Packet length.
 function ip:get_length ()
 	return self.ip_len
 end
 
---- Get IP packet header length from the parsed content.
+--- Get packet's header length.
 -- @treturn integer Header length.
 function ip:get_hdrlen ()
 	return self.ip_hl
 end
 
---- Get IP packet header checksum from the parsed content.
+--- Get packet's header checksum.
 -- @treturn integer Header checksum.
 function ip:get_hdrchecksum ()
 	return self.ip_sum
 end
 
---- Get IP packet fragment offset from the parsed content.
+--- Get packet's fragment offset.
 -- @treturn integer Fragment offset.
 function ip:get_fragoffset ()
 	return self.ip_off
