@@ -1,12 +1,12 @@
-.PHONY: all doc clean
+.PHONY: all docs clean
 
 all:
 	$(MAKE) -C src/
 
-doc:
-	$(MAKE) -C doc/ doc
+docs:
+	$(MAKE) -C docs/
 
 clean:
 	$(MAKE) -C src/ clean
-	$(MAKE) -C doc/ clean
+	$(MAKE) -C docs/ clean
 

@@ -1,6 +1,6 @@
-.PHONY: doc clean
+.PHONY: clean
 
-doc:
+all:
 	ldoc -c ./config.ld ../src/
 
 clean:
