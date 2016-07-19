@@ -24,7 +24,7 @@ end
 
 --- Create a new object.
 -- @tparam string frame pass frame data as an opaque string
--- @treturn table new eth table
+-- @treturn table New eth table.
 function eth.new (frame)
 	if type (frame) ~= "string" then
 		error ("parameter 'frame' is not a string", 2)
@@ -38,7 +38,7 @@ function eth.new (frame)
 end
 
 --- Parse frame data.
--- @treturn boolean true on success, false on failure (error message is set)
+-- @treturn boolean True on success, false on failure (error message is set).
 -- @see eth.new
 -- @see eth:set_frame
 function eth:parse ()
@@ -55,7 +55,7 @@ function eth:parse ()
 end
 
 --- Get raw packet data encapsulated in the frame data.
--- @treturn string raw packet data or empty string.
+-- @treturn string Raw packet data or an empty string.
 function eth:get_rawpacket ()
 	if string.len (self.buff) > 14 then
 		return string.sub (self.buff, 15, -1)
@@ -75,38 +75,38 @@ function eth:set_frame (frame)
 end
 
 --- Get EtherType value from the parsed content.
--- @treturn integer value representing a type of encapsulated packet
+-- @treturn integer Value representing a type of encapsulated packet.
 -- @see eth.type
 function eth:get_ethertype ()
 	return self.ether_type
 end
 
 --- Get source MAC address from the parsed content.
--- @treturn string MAC address formatted as xx:xx:xx:xx:xx:xx string
+-- @treturn string MAC address formatted as xx:xx:xx:xx:xx:xx string.
 function eth:get_saddr ()
 	return eth_ntop (self.mac_src)
 end
 
 --- Get destination MAC address from the parsed content.
--- @treturn string MAC address formatted as xx:xx:xx:xx:xx:xx string
+-- @treturn string MAC address formatted as xx:xx:xx:xx:xx:xx string.
 function eth:get_daddr ()
 	return eth_ntop (self.mac_dst)
 end
 
 --- Get source MAC address from the parsed content.
--- @treturn string raw bytes representing a MAC address
+-- @treturn string Byte string representing a MAC address.
 function eth:get_rawsaddr ()
 	return self.mac_src
 end
 
 --- Get destination MAC address from the parsed content.
--- @treturn string raw bytes representing a MAC address
+-- @treturn string Byte string representing a MAC address.
 function eth:get_rawdaddr ()
 	return self.mac_dst
 end
 
 --- Get last error message.
--- @treturn string error message
+-- @treturn string Error message.
 function eth:get_error ()
 	return self.errmsg or "no error"
 end
