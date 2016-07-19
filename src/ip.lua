@@ -88,7 +88,7 @@ function ip:parse ()
 	self.ip_offset = 0
 
 	self.ip_v = bit.rshift (bit.band (bstr.u8 (self.buff, self.ip_offset + 0), 0xF0), 4)
-	self.ip_hl = bit.band (bstr.u8 (self.buff, self.ip_offset + 0), 0x0F) -- header_length or data_offset
+	self.ip_hl = bit.band (bstr.u8 (self.buff, self.ip_offset + 0), 0x0F) * 4 -- header_length or data_offset
 
 	if self.ip_v ~= 4 then
 		self.errmsg = "not an IPv4 packet"
@@ -109,8 +109,8 @@ function ip:parse ()
 	self.ip_src = raw (self.buff, self.ip_offset + 12, 4) -- raw 4-bytes string
 	self.ip_dst = raw (self.buff, self.ip_offset + 16, 4)
 	self.ip_opt_offset = self.ip_offset + 20
-	self.ip_options = ip_parseopts (self.buff, self.ip_opt_offset, ((self.ip_hl * 4) - 20))
-	self.ip_data_offset = self.ip_offset + self.ip_hl * 4
+	self.ip_options = ip_parseopts (self.buff, self.ip_opt_offset, (self.ip_hl - 20))
+	self.ip_data_offset = self.ip_offset + self.ip_hl
 
 	return true
 end
@@ -119,7 +119,7 @@ end
 -- @treturn string Raw packet data or an empty string.
 function ip:get_rawpacket ()
 	if string.len (self.buff) > 20 then
-		return string.sub (self.buff, self.ip_hl, -1)
+		return string.sub (self.buff, self.ip_hl + 1, -1)
 	end
 
 	return ""
