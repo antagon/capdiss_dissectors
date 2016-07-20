@@ -1,6 +1,7 @@
 --- User Datagram Protocol (UDP) packet dissector.
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
 -- @module udp
+local bstr = require ("bstr")
 local udp = {}
 
 --- Create a new object.
