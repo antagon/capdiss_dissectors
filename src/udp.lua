@@ -33,6 +33,8 @@ function udp:parse ()
 	self.udp_dport = bstr.u16 (self.buff, 2)
 	self.udp_len = bstr.u16 (self.buff, 4)
 	self.udp_sum = bstr.u16 (self.buff, 6)
+
+	return true
 end
 
 --- Get data encapsulated in a packet.
