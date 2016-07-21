@@ -1,4 +1,5 @@
---- Internet Control Message Protocol
+--- Internet Control Message Protocol (ICMP) packet dissector.
+-- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
 -- @module icmp
 local bstr = require ("bstr")
 local icmp = {}
@@ -94,6 +95,12 @@ function icmp:get_datalen ()
 	return string.len (self.buff) - 8
 end
 
+--- Change or set new packet data.
+-- @tparam string packet byte string of packet data
+function icmp:set_packet (packet)
+	self.buff = packet
+end
+
 --- Get packet type.
 -- @treturn integer Packet type.
 -- @see icmp.type
@@ -119,6 +126,8 @@ end
 -- @tparam integer type Packet type.
 -- @tparam integer code Packet code.
 -- @treturn string Message or nil, if combination of type and code does not exists.
+-- @see icmp.type
+-- @see icmp.code
 function icmp.code_to_text (type, code)
 	local types = {}
 
