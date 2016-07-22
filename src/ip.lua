@@ -85,32 +85,29 @@ function ip:parse ()
 		return false
 	end
 
-	self.ip_offset = 0
-
-	self.ip_v = bit.rshift (bit.band (bstr.u8 (self.buff, self.ip_offset + 0), 0xF0), 4)
-	self.ip_hl = bit.band (bstr.u8 (self.buff, self.ip_offset + 0), 0x0F) * 4 -- header_length or data_offset
+	self.ip_v = bit.rshift (bit.band (bstr.u8 (self.buff, 0), 0xF0), 4)
+	self.ip_hl = bit.band (bstr.u8 (self.buff, 0), 0x0F) * 4
 
 	if self.ip_v ~= 4 then
 		self.errmsg = "not an IPv4 packet"
 		return false
 	end
 
-	self.ip_tos = bstr.u8 (self.buff, self.ip_offset + 1)
-	self.ip_len = bstr.u16 (self.buff, self.ip_offset + 2)
-	self.ip_id = bstr.u16 (self.buff, self.ip_offset + 4)
-	self.ip_off = bstr.u16 (self.buff, self.ip_offset + 6)
+	self.ip_tos = bstr.u8 (self.buff, 1)
+	self.ip_len = bstr.u16 (self.buff, 2)
+	self.ip_id = bstr.u16 (self.buff, 4)
+	self.ip_off = bstr.u16 (self.buff, 6)
 	self.ip_rf = bit.band (self.ip_off, 0x8000) ~= 0 -- true/false
 	self.ip_df = bit.band (self.ip_off, 0x4000) ~= 0
 	self.ip_mf = bit.band (self.ip_off, 0x2000) ~= 0
 	self.ip_off = bit.band (self.ip_off, 0x1FFF) -- fragment offset
-	self.ip_ttl = bstr.u8 (self.buff, self.ip_offset + 8)
-	self.ip_proto = bstr.u8 (self.buff, self.ip_offset + 9)
-	self.ip_sum = bstr.u16 (self.buff, self.ip_offset + 10)
-	self.ip_src = raw (self.buff, self.ip_offset + 12, 4) -- raw 4-bytes string
-	self.ip_dst = raw (self.buff, self.ip_offset + 16, 4)
-	self.ip_opt_offset = self.ip_offset + 20
+	self.ip_ttl = bstr.u8 (self.buff, 8)
+	self.ip_proto = bstr.u8 (self.buff, 9)
+	self.ip_sum = bstr.u16 (self.buff, 10)
+	self.ip_src = raw (self.buff, 12, 4) -- raw 4-bytes string
+	self.ip_dst = raw (self.buff, 16, 4)
+	self.ip_opt_offset = 20
 	self.ip_options = ip_parseopts (self.buff, self.ip_opt_offset, (self.ip_hl - 20))
-	self.ip_data_offset = self.ip_offset + self.ip_hl
 
 	return true
 end
