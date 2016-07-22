@@ -29,7 +29,7 @@ function udp:parse ()
 		return false
 	end
 
-	self.udp_sport = bstr.u16 (self.buff, 1)
+	self.udp_sport = bstr.u16 (self.buff, 0)
 	self.udp_dport = bstr.u16 (self.buff, 2)
 	self.udp_len = bstr.u16 (self.buff, 4)
 	self.udp_sum = bstr.u16 (self.buff, 6)

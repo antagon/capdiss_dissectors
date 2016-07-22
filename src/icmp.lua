@@ -102,9 +102,9 @@ function icmp:parse ()
 		return false
 	end
 
-	self.icmp_type = bstr.u8 (self.buff, 1)
-	self.icmp_code = bstr.u8 (self.buff, 2)
-	self.icmp_sum = bstr.u16 (self.buff, 3)
+	self.icmp_type = bstr.u8 (self.buff, 0)
+	self.icmp_code = bstr.u8 (self.buff, 1)
+	self.icmp_sum = bstr.u16 (self.buff, 2)
 
 	return true
 end
