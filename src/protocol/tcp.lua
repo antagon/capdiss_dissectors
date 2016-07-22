@@ -5,6 +5,13 @@ local bstr = require ("bstr")
 local bit = require ("bit32")
 local tcp = {}
 
+local function raw (buff, index, length)
+	if not index then index = 0 end
+	if not length then length = #buff - index end
+
+	return string.char(string.byte(buff, index+1, index+1+length-1))
+end
+
 local function tcp_parseopts (buff, offset, length)
 	local options = {}
 	local op = 1
@@ -24,7 +31,7 @@ local function tcp_parseopts (buff, offset, length)
 			l = bstr.u8(buff, offset + opt_ptr + 1)
 
 			if l > 2 then
-				d = raw(buff, offset + opt_ptr + 2, l-2)
+				d = raw (buff, offset + opt_ptr + 2, l-2)
 			end
 		end
 
@@ -57,7 +64,10 @@ end
 -- @see tcp.new
 -- @see tcp:set_packet
 function tcp:parse ()
-	if string.len (self.buff) < 20 then
+	if self.buff == nil then
+		self.errmsg = "no data"
+		return false
+	elseif string.len (self.buff) < 20 then
 		self.errmsg = "incomplete TCP header data"
 		return false
 	end
