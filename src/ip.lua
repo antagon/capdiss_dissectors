@@ -9,9 +9,20 @@ local ip = {}
 --- IP protocol types.
 -- @see ip:get_protocol
 ip.type = {
-	IPPROTO_ICMP = 0x01, -- Internet Control Message Protocol
-	IPPROTO_TCP = 0x06, -- Transmission Control Protocol
-	IPPROTO_UDP = 0x11 -- User Datagram Protocol
+	IPPROTO_HOPOPT = 0x00,      -- IPv6 Hop-by-Hop Option
+	IPPROTO_ICMP = 0x01,        -- Internet Control Message Protocol
+	IPPROTO_IGMP = 0x02,        -- Internet Group Management Protocol
+	IPPROTO_IPIP = 0x04,        -- IP in IP (encapsulation)
+	IPPROTO_TCP = 0x06,         -- Transmission Control Protocol
+	IPPROTO_EGP = 0x08,         -- Exterior Gateway Protocol
+	IPPROTO_UDP = 0x11,         -- User Datagram Protocol
+	IPPROTO_IPV6 = 0x29,        -- IPv6 Encapsulation
+	IPPROTO_IPV6ROUTE = 0x2B,   -- Routing Header for IPv6
+	IPPROTO_IPV6FRAG = 0x2C,    -- Fragment Header for IPv6
+	IPPROTO_IPV6ICMP = 0x3A,    -- ICMP for IPv6
+	IPPROTO_IPV6NONXT = 0x3B,   -- No Next Header for IPv6
+	IPPROTO_IPV6DSTOPTS = 0x3C, -- Destination Options for IPv6
+	IPPROTO_IPV6MOBHDR = 0x87   -- Mobility Extension Header for IPv6
 }
 
 local function raw (buff, index, length)
@@ -89,7 +100,7 @@ function ip:parse ()
 	self.ip_hl = bit.band (bstr.u8 (self.buff, 0), 0x0F) * 4
 
 	if self.ip_v ~= 4 then
-		self.errmsg = "not an IPv4 packet"
+		self.errmsg = "not an IP packet"
 		return false
 	end
 
@@ -97,14 +108,14 @@ function ip:parse ()
 	self.ip_len = bstr.u16 (self.buff, 2)
 	self.ip_id = bstr.u16 (self.buff, 4)
 	self.ip_off = bstr.u16 (self.buff, 6)
-	self.ip_rf = bit.band (self.ip_off, 0x8000) ~= 0 -- true/false
+	self.ip_rf = bit.band (self.ip_off, 0x8000) ~= 0
 	self.ip_df = bit.band (self.ip_off, 0x4000) ~= 0
 	self.ip_mf = bit.band (self.ip_off, 0x2000) ~= 0
-	self.ip_off = bit.band (self.ip_off, 0x1FFF) -- fragment offset
+	self.ip_off = bit.band (self.ip_off, 0x1FFF)
 	self.ip_ttl = bstr.u8 (self.buff, 8)
 	self.ip_proto = bstr.u8 (self.buff, 9)
 	self.ip_sum = bstr.u16 (self.buff, 10)
-	self.ip_src = raw (self.buff, 12, 4) -- raw 4-bytes string
+	self.ip_src = raw (self.buff, 12, 4)
 	self.ip_dst = raw (self.buff, 16, 4)
 	self.ip_opt_offset = 20
 	self.ip_options = ip_parseopts (self.buff, self.ip_opt_offset, (self.ip_hl - 20))
