@@ -1,7 +1,7 @@
 --- Internet protocol version 6 packet dissector.
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
 -- @module ipv6
-
+local bit = require ("bit32")
 local bstr = require ("bstr")
 local ipv6 = {}
 
@@ -51,12 +51,15 @@ end
 -- @see ipv6.new
 -- @see ipv6:set_packet
 function ipv6:parse ()
-	if string.len (self.buff) < 40 then
+	if self.buff == nil then
+		self.errmsg = "no data"
+		return false
+	elseif string.len (self.buff) < 40 then
 		self.errmsg = "incomplete IPv6 header data"
 		return false
 	end
 
-	self.ip_v = bit.rshift (bit.band (bstr.u8 (0), 0xF0), 4)
+	self.ip_v = bit.rshift (bit.band (bstr.u8 (self.buff, 0), 0xF0), 4)
 
 	if self.ip_v ~= 6 then
 		self.errmsg = "not an IPv6 packet"
