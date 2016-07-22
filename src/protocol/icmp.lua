@@ -97,7 +97,10 @@ end
 -- @see icmp.new
 -- @see icmp:set_packet
 function icmp:parse ()
-	if string.len (self.buff) < 8 then
+	if self.buff == nil then
+		self.errmsg = "no data"
+		return false
+	elseif string.len (self.buff) < 8 then
 		self.errmsg = "incomplete ICMP header data"
 		return false
 	end

@@ -24,7 +24,10 @@ end
 -- @see udp.new
 -- @see udp:set_packet
 function udp:parse ()
-	if string.len (self.buff) < 8 then
+	if self.buff == nil then
+		self.errmsg = "no data"
+		return false
+	elseif string.len (self.buff) < 8 then
 		self.errmsg = "incomplete UDP header data"
 		return false
 	end

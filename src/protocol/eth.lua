@@ -43,7 +43,10 @@ end
 -- @see eth.new
 -- @see eth:set_frame
 function eth:parse ()
-	if not self.buff or string.len (self.buff) < 14 then
+	if self.buff == nil then
+		self.errmsg = "no data"
+		return false
+	elseif string.len (self.buff) < 14 then
 		self.errmsg = "incomplete Ethernet frame data"
 		return false
 	end

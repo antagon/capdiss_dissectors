@@ -91,7 +91,10 @@ end
 -- @see ip.new
 -- @see ip:set_packet
 function ip:parse ()
-	if string.len (self.buff) < 20 then
+	if self.buff == nil then
+		self.errmsg = "no data"
+		return false
+	elseif string.len (self.buff) < 20 then
 		self.errmsg = "incomplete IP header data"
 		return false
 	end
