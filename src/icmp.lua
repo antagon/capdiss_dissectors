@@ -211,5 +211,11 @@ function icmp.code_to_text (type, code)
 	return nil
 end
 
+--- Get last error message.
+-- @treturn string Error message.
+function icmp:get_error ()
+	return self.errmsg or "no error"
+end
+
 return icmp
 

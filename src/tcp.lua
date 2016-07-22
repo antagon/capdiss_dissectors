@@ -216,5 +216,11 @@ function tcp:get_urgpointer ()
 	return self.tcp_urgp
 end
 
+--- Get last error message.
+-- @treturn string Error message.
+function tcp:get_error ()
+	return self.errmsg or "no error"
+end
+
 return tcp
 

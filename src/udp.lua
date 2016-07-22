@@ -79,5 +79,11 @@ function udp:get_checksum ()
 	return self.udp_sum
 end
 
+--- Get last error message.
+-- @treturn string Error message.
+function udp:get_error ()
+	return self.errmsg or "no error"
+end
+
 return udp
 
