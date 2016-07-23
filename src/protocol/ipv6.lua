@@ -31,6 +31,13 @@ local function raw (buff, index, length)
 	return string.char(string.byte(buff, index+1, index+1+length-1))
 end
 
+local function ip_ntop (buff)
+	return ("%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x"):format (
+		bstr.u16 (buff, 0), bstr.u16 (buff, 2), bstr.u16 (buff, 4),
+		bstr.u16 (buff, 6), bstr.u16 (buff, 8), bstr.u16 (buff, 10),
+		bstr.u16 (buff, 12), bstr.u16 (buff, 14))
+end
+
 --- Create a new object.
 -- @tparam string packet pass packet data as an opaque string
 -- @treturn table New ipv6 table.
@@ -96,8 +103,7 @@ end
 --- Get packet's source IP address.
 -- @treturn string IP address formatted as XXX.XXX.XXX.XXX string.
 function ipv6:get_saddr ()
-	-- TODO
-	--return ip_ntop (self.ip_src)
+	return ip_ntop (self.ip6_src)
 end
 
 --- Get packet's source IP address.
@@ -109,8 +115,7 @@ end
 --- Get packet's destination IP address.
 -- @treturn string IPv6 address formatted as XXX.XXX.XXX.XXX string.
 function ipv6:get_daddr ()
-	-- TODO
-	--return ip_ntop (self.ip_dst)
+	return ip_ntop (self.ip6_dst)
 end
 
 --- Get packet's destination IP address.
