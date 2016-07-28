@@ -30,7 +30,7 @@ function dissector:set_hooks (hooks)
 		end
 	end
 
-	dissector.hooks = hooks
+	dissector.usr_hook = hooks
 
 	return true
 end
@@ -101,8 +101,8 @@ function dissector:run ()
 
 		if frame_proto then
 			for name, packet in pairs (frame_proto) do
-				if dissector.hook[name] then
-					dissector.hook[name] (packet)
+				if dissector.usr_hook[name] then
+					dissector.usr_hook[name] (packet)
 				end
 			end
 		else
