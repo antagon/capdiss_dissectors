@@ -102,7 +102,7 @@ end
 
 --- Get packet's IP address version.
 -- @treturn integer IP address version.
-function ip:get_version ()
+function ipv6:get_version ()
 	return 6
 end
 
