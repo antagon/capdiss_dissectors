@@ -100,6 +100,12 @@ function ipv6:set_packet (packet)
 	self.buff = packet
 end
 
+--- Get packet's IP address version.
+-- @treturn integer IP address version.
+function ip:get_version ()
+	return 6
+end
+
 --- Get packet's source IP address.
 -- @treturn string IP address formatted as XXX.XXX.XXX.XXX string.
 function ipv6:get_saddr ()

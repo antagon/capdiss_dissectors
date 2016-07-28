@@ -142,6 +142,12 @@ function ip:set_packet (packet)
 	self.buff = packet
 end
 
+--- Get packet's IP address version.
+-- @treturn integer IP address version.
+function ip:get_version ()
+	return 4
+end
+
 --- Get packet's source IP address.
 -- @treturn string IP address formatted as XXX.XXX.XXX.XXX string.
 function ip:get_saddr ()
