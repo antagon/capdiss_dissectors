@@ -9,10 +9,12 @@ dissector.link_type = {
 
 --- A list of supported protocols.
 dissector.proto = {
-	eth = true, -- Ethernet II
-	ip = true,  -- Internet protocol version 4
-	tcp = true, -- Transmission Control Protocol (TCP)
-	udp = true  -- User Datagram Protocol (UDP)
+	eth = true,  -- Ethernet II
+	ip = true,   -- Internet protocol version 4
+	ipv6 = true, -- Internet protocol version 6
+	tcp = true,  -- Transmission Control Protocol (TCP)
+	udp = true,  -- User Datagram Protocol (UDP)
+	icmp = true  -- Internet Control Message Protocol (ICMP)
 }
 
 function dissector.new ()
@@ -74,6 +76,7 @@ local function parse_ip_packet (ip_obj)
 	end
 
 	local proto_l4 = nil
+	local proto_l4_name = ""
 
 	if proto_type == ip_obj.type.IPPROTO_TCP then
 		proto_l4 = require ("protocol/tcp")
@@ -81,8 +84,9 @@ local function parse_ip_packet (ip_obj)
 	elseif proto_type == ip_obj.type.IPPROTO_UDP then
 		proto_l4 = require ("protocol/udp")
 		proto_l4_name = "udp"
-	else
-		-- TODO: some other protocols, here...
+	elseif proto_type == ip_obj.type.IPPROTO_ICMP then
+		proto_l4 = require ("protocol/icmp")
+		proto_l4_name = "icmp"
 	end
 
 	if proto_l4 then
@@ -110,34 +114,35 @@ local function parse_eth_frame (frame)
 
 	table.insert (proto, { name = "eth", data = eth })
 
-	local ip = nil
+	local proto_l3 = nil
+	local proto_l3_name = ""
 
 	if eth:get_ethertype () == eth.type.ETHERTYPE_IP then
-		ip = require ("protocol/ip")
+		proto_l3 = require ("protocol/ip")
+		proto_l3_name = "ip"
 	elseif eth:get_ethertype () == eth.type.ETHERTYPE_IPV6 then
-		ip = require ("protocol/ipv6")
+		proto_l3 = require ("protocol/ipv6")
+		proto_l3_name = "ipv6"
 	end
 
-	if ip then
-		ip:set_packet (eth:get_rawpacket ())
+	if proto_l3 then
+		proto_l3:set_packet (eth:get_rawpacket ())
 
-		if not ip:parse () then
+		if not proto_l3:parse () then
 			return nil, ip:get_error ()
 		end
 
-		if ip:get_version () == 4 then
-			table.insert (proto, { name = "ip", data = ip })
-		else
-			table.insert (proto, { name = "ipv6", data = ip })
+		table.insert (proto, { name = proto_l3_name, data = proto_l3 })
+
+		if proto_l3_name == "ip" or proto_l3_name == "ipv6" then
+			local ip_proto, errmsg = parse_ip_packet (proto_l3)
+
+			if not ip_proto then
+				return nil, errmsg
+			end
+
+			merge_tables (proto, ip_proto)
 		end
-
-		local ip_proto, errmsg = parse_ip_packet (ip)
-
-		if not ip_proto then
-			return nil, errmsg
-		end
-
-		merge_tables (proto, ip_proto)
 	end
 
 	return proto
