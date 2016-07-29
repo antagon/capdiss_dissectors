@@ -1,6 +1,6 @@
 --- Ethernet II frame dissector.
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
--- @module eth
+-- @classmod eth
 
 local bstr = require ("bstr")
 
@@ -8,7 +8,7 @@ local eth = {}
 
 --- EtherType constants.
 -- @see eth:get_ethertype
-eth.type = {
+eth.ethertype = {
 	ETHERTYPE_IP = 0x0800, -- Internet Protocol version 4
 	ETHERTYPE_ARP = 0x0806, -- Address Resolution Protocol
 	ETHERTYPE_IPV6 = 0x86DD -- Internet Protocol version 6
@@ -26,7 +26,7 @@ end
 --- Create a new object.
 -- @tparam string frame pass frame data as an opaque string
 -- @treturn table New eth table.
-function eth.new (frame)
+function eth:new (frame)
 	if type (frame) ~= "string" then
 		error ("parameter 'frame' is not a string", 2)
 	end
@@ -40,7 +40,7 @@ end
 
 --- Parse frame data.
 -- @treturn boolean True on success, false on failure (error message is set).
--- @see eth.new
+-- @see eth:new
 -- @see eth:set_frame
 function eth:parse ()
 	if self.buff == nil then
@@ -86,7 +86,7 @@ end
 
 --- Get EtherType value from the parsed content.
 -- @treturn integer Value representing a type of encapsulated packet.
--- @see eth.type
+-- @see eth.ethertype
 function eth:get_ethertype ()
 	return self.ether_type
 end

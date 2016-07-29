@@ -1,6 +1,6 @@
 --- Internet protocol version 4 packet dissector.
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
--- @module ip
+-- @classmod ip
 
 local bit = require ("bit32")
 local bstr = require ("bstr")
@@ -8,7 +8,7 @@ local ip = {}
 
 --- IP protocol types.
 -- @see ip:get_protocol
-ip.type = {
+ip.proto = {
 	IPPROTO_HOPOPT = 0x00,      -- IPv6 Hop-by-Hop Option
 	IPPROTO_ICMP = 0x01,        -- Internet Control Message Protocol
 	IPPROTO_IGMP = 0x02,        -- Internet Group Management Protocol
@@ -74,7 +74,7 @@ end
 --- Create a new object.
 -- @tparam string packet pass packet data as an opaque string
 -- @treturn table New ip table.
-function ip.new (packet)
+function ip:new (packet)
 	if type (packet) ~= "string" then
 		error ("parameter 'packet' is not a string", 2)
 	end
@@ -88,7 +88,7 @@ end
 
 --- Parse the packet data.
 -- @treturn boolean True on success, false on failure (error message is set).
--- @see ip.new
+-- @see ip:new
 -- @see ip:set_packet
 function ip:parse ()
 	if self.buff == nil then
@@ -192,7 +192,7 @@ end
 
 --- Get packet's protocol ID.
 -- @treturn integer A value representing a type of encapsulated data.
--- @see ip.type
+-- @see ip.proto
 function ip:get_protocol ()
 	return self.ip_proto
 end

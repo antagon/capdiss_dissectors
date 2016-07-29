@@ -1,13 +1,13 @@
 --- Internet protocol version 6 packet dissector.
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
--- @module ipv6
+-- @classmod ipv6
 local bit = require ("bit32")
 local bstr = require ("bstr")
 local ipv6 = {}
 
 --- IPv6 protocol types.
 -- @see ipv6:get_nexthdrtype
-ipv6.type = {
+ipv6.proto = {
 	IPPROTO_HOPOPT = 0x00,      -- IPv6 Hop-by-Hop Option
 	IPPROTO_ICMP = 0x01,        -- Internet Control Message Protocol
 	IPPROTO_IGMP = 0x02,        -- Internet Group Management Protocol
@@ -41,7 +41,7 @@ end
 --- Create a new object.
 -- @tparam string packet pass packet data as an opaque string
 -- @treturn table New ipv6 table.
-function ipv6.new (packet)
+function ipv6:new (packet)
 	if type (packet) ~= "string" then
 		error ("parameter 'packet' is not a string", 2)
 	end
@@ -55,7 +55,7 @@ end
 
 --- Parse the packet data.
 -- @treturn boolean True on success, false on failure (error message is set).
--- @see ipv6.new
+-- @see ipv6:new
 -- @see ipv6:set_packet
 function ipv6:parse ()
 	if self.buff == nil then
@@ -156,7 +156,7 @@ end
 
 --- Get type of packet's next header.
 -- @treturn integer Next header type. This field carries the same value as the protocol field in IPv4 packet header.
--- @see ipv6.type
+-- @see ipv6.proto
 function ipv6:get_nexthdrtype ()
 	return self.ip6_nhdr
 end

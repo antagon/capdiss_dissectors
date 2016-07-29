@@ -1,11 +1,11 @@
 --- Internet Control Message Protocol (ICMP) packet dissector.
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
--- @module icmp
+-- @classmod icmp
 local bstr = require ("bstr")
 local icmp = {}
 
 --- ICMP message types.
-icmp.type = {
+icmp.types = {
 	ICMP_ECHOREPLY = 0,       -- Echo reply
 	ICMP_DEST_UNREACH = 3,    -- Destination unreachable
 	ICMP_SOURCE_QUENCH = 4,   -- Source quench
@@ -28,7 +28,7 @@ icmp.type = {
 }
 
 --- ICMP message type codes.
-icmp.code = {
+icmp.codes = {
 	ICMP_NET_UNREACH = 0,          -- Network unreachable
 	ICMP_HOST_UNREACH = 1,         -- Host unreachable
 	ICMP_PROT_UNREACH = 2,         -- Protocol unreachable
@@ -80,7 +80,7 @@ icmp.code = {
 --- Create a new object.
 -- @tparam string packet byte string of packet data 
 -- @treturn table New icmp table.
-function icmp.new (packet)
+function icmp:new (packet)
 	if type (packet) ~= "string" then
 		error ("parameter 'packet' is not a string", 2)
 	end
@@ -94,7 +94,7 @@ end
 
 --- Parse the packet data.
 -- @treturn boolean True on success, false on failure (error message is set).
--- @see icmp.new
+-- @see icmp:new
 -- @see icmp:set_packet
 function icmp:parse ()
 	if self.buff == nil then
@@ -138,14 +138,14 @@ end
 
 --- Get packet type.
 -- @treturn integer Packet type.
--- @see icmp.type
+-- @see icmp.types
 function icmp:get_type ()
 	return self.icmp_type
 end
 
 --- Get packet code.
 -- @treturn integer Packet code.
--- @see icmp.code
+-- @see icmp.codes
 -- @see icmp.code_to_text
 function icmp:get_code ()
 	return self.icmp_code
@@ -161,8 +161,8 @@ end
 -- @tparam integer type Packet type.
 -- @tparam integer code Packet code.
 -- @treturn string Message or nil, if combination of type and code does not exists.
--- @see icmp.type
--- @see icmp.code
+-- @see icmp.types
+-- @see icmp.codes
 function icmp.code_to_text (type, code)
 	local types = {}
 

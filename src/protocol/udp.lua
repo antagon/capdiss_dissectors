@@ -1,13 +1,13 @@
 --- User Datagram Protocol (UDP) packet dissector.
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
--- @module udp
+-- @classmod udp
 local bstr = require ("bstr")
 local udp = {}
 
 --- Create a new object.
 -- @tparam string packet byte string of packet data 
 -- @treturn table New udp table.
-function udp.new (packet)
+function udp:new (packet)
 	if type (packet) ~= "string" then
 		error ("parameter 'packet' is not a string", 2)
 	end
@@ -21,7 +21,7 @@ end
 
 --- Parse the packet data.
 -- @treturn boolean True on success, false on failure (error message is set).
--- @see udp.new
+-- @see udp:new
 -- @see udp:set_packet
 function udp:parse ()
 	if self.buff == nil then

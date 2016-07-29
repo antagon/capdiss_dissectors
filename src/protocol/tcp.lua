@@ -1,6 +1,6 @@
 --- Transmission Control Protocol (TCP) packet dissector.
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
--- @module tcp
+-- @classmod tcp
 local bstr = require ("bstr")
 local bit = require ("bit32")
 local tcp = {}
@@ -47,7 +47,7 @@ end
 --- Create a new object.
 -- @tparam string packet byte string of packet data 
 -- @treturn table New tcp table.
-function tcp.new (packet)
+function tcp:new (packet)
 	if type (packet) ~= "string" then
 		error ("parameter 'packet' is not a string", 2)
 	end
@@ -61,7 +61,7 @@ end
 
 --- Parse the packet data.
 -- @treturn boolean True on success, false on failure (error message is set).
--- @see tcp.new
+-- @see tcp:new
 -- @see tcp:set_packet
 function tcp:parse ()
 	if self.buff == nil then

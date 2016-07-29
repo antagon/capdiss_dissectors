@@ -78,13 +78,13 @@ local function parse_ip_packet (ip_obj)
 	local proto_l4 = nil
 	local proto_l4_name = ""
 
-	if proto_type == ip_obj.type.IPPROTO_TCP then
+	if proto_type == ip_obj.proto.IPPROTO_TCP then
 		proto_l4 = require ("protocol/tcp")
 		proto_l4_name = "tcp"
-	elseif proto_type == ip_obj.type.IPPROTO_UDP then
+	elseif proto_type == ip_obj.proto.IPPROTO_UDP then
 		proto_l4 = require ("protocol/udp")
 		proto_l4_name = "udp"
-	elseif proto_type == ip_obj.type.IPPROTO_ICMP then
+	elseif proto_type == ip_obj.proto.IPPROTO_ICMP then
 		proto_l4 = require ("protocol/icmp")
 		proto_l4_name = "icmp"
 	end
@@ -117,10 +117,10 @@ local function parse_eth_frame (frame)
 	local proto_l3 = nil
 	local proto_l3_name = ""
 
-	if eth:get_ethertype () == eth.type.ETHERTYPE_IP then
+	if eth:get_ethertype () == eth.ethertype.ETHERTYPE_IP then
 		proto_l3 = require ("protocol/ip")
 		proto_l3_name = "ip"
-	elseif eth:get_ethertype () == eth.type.ETHERTYPE_IPV6 then
+	elseif eth:get_ethertype () == eth.ethertype.ETHERTYPE_IPV6 then
 		proto_l3 = require ("protocol/ipv6")
 		proto_l3_name = "ipv6"
 	end
