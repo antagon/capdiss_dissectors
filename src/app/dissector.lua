@@ -78,15 +78,38 @@ local function parse_ip_packet (ip_obj)
 	local proto_l4 = nil
 	local proto_l4_name = ""
 
+	-- TCP
 	if proto_type == ip_obj.proto.IPPROTO_TCP then
 		proto_l4 = require ("protocol/tcp")
 		proto_l4_name = "tcp"
+
+	-- UDP
 	elseif proto_type == ip_obj.proto.IPPROTO_UDP then
 		proto_l4 = require ("protocol/udp")
 		proto_l4_name = "udp"
+
+	-- ICMP
 	elseif proto_type == ip_obj.proto.IPPROTO_ICMP then
 		proto_l4 = require ("protocol/icmp")
 		proto_l4_name = "icmp"
+
+	-- Encapsulated IP (tunneling)
+	elseif proto_type == ip_obj.proto.IPPROTO_IPIP then
+		local ip_encaps = ip_obj:new (ip_obj:get_rawpacket ())
+
+		if not ip_encaps:parse () then
+			return nil, ip_encaps:get_error ()
+		end
+
+		table.insert (proto, { name = "ip", data = ip_encaps })
+
+		local ip_proto, errmsg = parse_ip_packet (ip_encaps)
+
+		if not ip_proto then
+			return nil, errmsg
+		end
+
+		merge_tables (proto, ip_proto)
 	end
 
 	if proto_l4 then
@@ -176,11 +199,11 @@ function dissector:run ()
 			for _, proto in ipairs (frame_proto) do
 				-- If 'any' hook is set, execute it first...
 				if dissector.usr_hook["*"] then
-					dissector.usr_hook["*"] (proto.data)
+					dissector.usr_hook["*"] (proto.data, ts, num)
 				end
 
 				if dissector.usr_hook[proto.name] then
-					dissector.usr_hook[proto.name] (proto.data)
+					dissector.usr_hook[proto.name] (proto.data, ts, num)
 				end
 			end
 		else
