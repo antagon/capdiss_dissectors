@@ -1,9 +1,13 @@
+--- Dissector Application.
+-- @module dissector
 local dissector = {}
 
+--- A list of supported link-types.
 dissector.link_type = {
 	EN10MB = true
 }
 
+--- A list of supported protocols.
 dissector.proto = {
 	eth = true,
 	ip = true,
@@ -17,16 +21,22 @@ function dissector.new ()
 	return new_diss
 end
 
+local function is_specialhook (name)
+	return name == "*" or name == "sigaction"
+end
+
 function dissector:set_hooks (hooks)
 	for idx, func in pairs (hooks) do
-		if not dissector.proto[idx] then
-			self.errmsg = ("protocol '%s' not supported"):format (idx)
+		if type (func) ~= "function" then
+			self.errmsg = ("a hook '%s' is not a function"):format (idx)
 			return false
 		end
 
-		if type (func) ~= "function" then
-			self.errmsg = ("a hook for protocol '%s' is not a function"):format (idx)
-			return false
+		if not is_specialhook (idx) then
+			if not dissector.proto[idx] then
+				self.errmsg = ("protocol '%s' not supported"):format (idx)
+				return false
+			end
 		end
 	end
 
@@ -125,6 +135,8 @@ local function parse_eth_frame (frame)
 	return proto
 end
 
+--- Run application.
+-- @treturn table
 function dissector:run ()
 	local hooks = {}
 
@@ -149,6 +161,11 @@ function dissector:run ()
 
 		if frame_proto then
 			for _, proto in ipairs (frame_proto) do
+				-- If 'any' hook is set, execute it first...
+				if dissector.usr_hook["*"] then
+					dissector.usr_hook["*"] (proto.data)
+				end
+
 				if dissector.usr_hook[proto.name] then
 					dissector.usr_hook[proto.name] (proto.data)
 				end
@@ -158,19 +175,18 @@ function dissector:run ()
 		end
 	end
 
-	hooks.finish = function ()
-		local dissector = self
-	end
-
-	hooks.sigaction = function ()
-		local dissector = self
+	-- Set signal handler, if it was set in a hook table.
+	if self.usr_hook["sigaction"] then
+		hooks.sigaction = self.usr_hook["sigaction"]
 	end
 
 	return hooks
 end
 
+--- Get last error message.
+-- @treturn string Error message.
 function dissector:get_error ()
-	return self.errmsg
+	return self.errmsg or "no error"
 end
 
 return dissector
