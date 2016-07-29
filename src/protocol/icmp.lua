@@ -112,6 +112,12 @@ function icmp:parse ()
 	return true
 end
 
+--- Get the module name.
+-- @treturn string Module name.
+function icmp:type ()
+	return "icmp"
+end
+
 --- Get data encapsulated in a packet.
 -- @treturn string Packet data or an empty string.
 function icmp:get_data ()

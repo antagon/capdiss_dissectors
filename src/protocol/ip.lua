@@ -126,6 +126,12 @@ function ip:parse ()
 	return true
 end
 
+--- Get the module name.
+-- @treturn string Module name.
+function ip:type ()
+	return "ip"
+end
+
 --- Get raw packet data uncapsulated in the IP packet data.
 -- @treturn string Raw packet data or an empty string.
 function ip:get_rawpacket ()

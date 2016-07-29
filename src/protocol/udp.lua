@@ -40,6 +40,12 @@ function udp:parse ()
 	return true
 end
 
+--- Get the module name.
+-- @treturn string Module name.
+function udp:type ()
+	return "udp"
+end
+
 --- Get data encapsulated in a packet.
 -- @treturn string Packet data or an empty string.
 function udp:get_data ()

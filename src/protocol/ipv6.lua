@@ -84,6 +84,12 @@ function ipv6:parse ()
 	return true
 end
 
+--- Get the module name.
+-- @treturn string Module name.
+function ipv6:type ()
+	return "ipv6"
+end
+
 --- Get raw packet data uncapsulated in the IPv6 packet data.
 -- @treturn string Raw packet data or an empty string.
 function ipv6:get_nextheader ()

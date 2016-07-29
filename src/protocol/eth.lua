@@ -58,6 +58,12 @@ function eth:parse ()
 	return true
 end
 
+--- Get the module name.
+-- @treturn string Module name.
+function eth:type ()
+	return "eth"
+end
+
 --- Get raw packet data encapsulated in the frame data.
 -- @treturn string Raw packet data or an empty string.
 function eth:get_rawpacket ()

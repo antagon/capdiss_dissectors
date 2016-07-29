@@ -100,6 +100,12 @@ function tcp:parse ()
 	return true
 end
 
+--- Get the module name.
+-- @treturn string Module name.
+function tcp:type ()
+	return "tcp"
+end
+
 --- Get data encapsulated in a packet.
 -- @treturn string Packet data or an empty string.
 function tcp:get_data ()
