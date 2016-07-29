@@ -1,4 +1,4 @@
---- Dissector Application.
+--- A dissector application.
 -- @module dissector
 local dissector = {}
 
@@ -9,10 +9,10 @@ dissector.link_type = {
 
 --- A list of supported protocols.
 dissector.proto = {
-	eth = true,
-	ip = true,
-	tcp = true,
-	udp = true
+	eth = true, -- Ethernet II
+	ip = true,  -- Internet protocol version 4
+	tcp = true, -- Transmission Control Protocol (TCP)
+	udp = true  -- User Datagram Protocol (UDP)
 }
 
 function dissector.new ()
@@ -25,7 +25,15 @@ local function is_specialhook (name)
 	return name == "*" or name == "sigaction"
 end
 
+--- Set a hook table.
+-- @tparam table hooks A key in a table is used to match a protocol name or a
+-- special hook name. The value stored in each key must be a function.
+-- @treturn boolean True on success, false on failure (error message is set).
 function dissector:set_hooks (hooks)
+	if type (hooks) ~= "table" then
+		error ("parameter 'hooks' is not a table", 2)
+	end
+
 	for idx, func in pairs (hooks) do
 		if type (func) ~= "function" then
 			self.errmsg = ("a hook '%s' is not a function"):format (idx)
