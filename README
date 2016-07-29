@@ -1,1 +1,6 @@
-capdiss protocol dissectors.
+Coroner: A Packet Dissection Framework
+
+Coroner is a packet dissection framework for capdiss.
+
+See: http://codeward.org/software/capdiss
+
