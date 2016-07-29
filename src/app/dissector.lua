@@ -35,7 +35,49 @@ function dissector:set_hooks (hooks)
 	return true
 end
 
-local function parse_ip_packet (version, packet)
+local function merge_tables (t1, t2)
+	for _, v in pairs (t2) do
+		table.insert (t1, v)
+	end
+
+	return t1
+end
+
+local function parse_ip_packet (ip_obj)
+	local proto_type = nil
+	local proto = {}
+
+	if ip_obj:get_version () == 4 then
+		proto_type = ip_obj:get_protocol ()
+	elseif ip_obj:get_version () == 6 then
+		proto_type = ip_obj:get_nexthdrtype ()
+	else
+		return nil, "unknown IP version"
+	end
+
+	local proto_l4 = nil
+
+	if proto_type == ip_obj.type.IPPROTO_TCP then
+		proto_l4 = require ("protocol/tcp")
+		proto_l4_name = "tcp"
+	elseif proto_type == ip_obj.type.IPPROTO_UDP then
+		proto_l4 = require ("protocol/udp")
+		proto_l4_name = "udp"
+	else
+		-- TODO: some other protocols, here...
+	end
+
+	if proto_l4 then
+		proto_l4:set_packet (ip_obj:get_rawpacket ())
+
+		if not proto_l4:parse () then
+			return nil, proto_l4:get_error ()
+		end
+
+		table.insert (proto, { name = proto_l4_name, data = proto_l4 })
+	end
+
+	return proto
 end
 
 local function parse_eth_frame (frame)
@@ -48,7 +90,7 @@ local function parse_eth_frame (frame)
 		return nil, eth:get_error ()
 	end
 
-	proto["eth"] = eth
+	table.insert (proto, { name = "eth", data = eth })
 
 	local ip = nil
 
@@ -66,12 +108,18 @@ local function parse_eth_frame (frame)
 		end
 
 		if ip:get_version () == 4 then
-			proto["ip"] = ip
+			table.insert (proto, { name = "ip", data = ip })
 		else
-			proto["ipv6"] = ip
+			table.insert (proto, { name = "ipv6", data = ip })
 		end
 
-		-- TODO: parse transport protocol
+		local ip_proto, errmsg = parse_ip_packet (ip)
+
+		if not ip_proto then
+			return nil, errmsg
+		end
+
+		merge_tables (proto, ip_proto)
 	end
 
 	return proto
@@ -100,9 +148,9 @@ function dissector:run ()
 		end
 
 		if frame_proto then
-			for name, packet in pairs (frame_proto) do
-				if dissector.usr_hook[name] then
-					dissector.usr_hook[name] (packet)
+			for _, proto in ipairs (frame_proto) do
+				if dissector.usr_hook[proto.name] then
+					dissector.usr_hook[proto.name] (proto.data)
 				end
 			end
 		else
