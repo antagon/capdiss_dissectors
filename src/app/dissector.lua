@@ -103,17 +103,21 @@ local function parse_ip_packet (ip_obj)
 
 		table.insert (proto, { name = "ip", data = ip_encaps })
 
-		local ip_proto, errmsg = parse_ip_packet (ip_encaps)
+		local ip_encaps_proto, errmsg = parse_ip_packet (ip_encaps)
 
-		if not ip_proto then
+		if not ip_encaps_proto then
 			return nil, errmsg
 		end
 
-		merge_tables (proto, ip_proto)
+		merge_tables (proto, ip_encaps_proto)
 	end
 
 	if proto_l4 then
-		proto_l4:set_packet (ip_obj:get_rawpacket ())
+		if ip_obj:get_version () == 4 then
+			proto_l4:set_packet (ip_obj:get_rawpacket ())
+		else
+			proto_l4:set_packet (ip_obj:get_nextheader ())
+		end
 
 		if not proto_l4:parse () then
 			return nil, proto_l4:get_error ()
