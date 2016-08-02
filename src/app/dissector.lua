@@ -24,7 +24,9 @@ function dissector.new ()
 end
 
 local function is_specialhook (name)
-	return name == "*" or name == "sigaction"
+	return name == "@" or name == "*"
+		or name == "^" or name == "$"
+		or name == "sigaction"
 end
 
 --- Set a hook table.
@@ -188,6 +190,10 @@ function dissector:run ()
 		end
 
 		dissector.opts = { filename = filename, linktype = linktype }
+
+		if dissector.usr_hook["@"] then
+			dissector.usr_hook["@"] (filename, linktype)
+		end
 	end
 
 	hooks.each = function (frame, ts, num)
@@ -200,8 +206,15 @@ function dissector:run ()
 		end
 
 		if frame_proto then
+			--
+			-- Execute user hooks
+			--
+			if dissector.usr_hook["^"] then
+				dissector.usr_hook["^"] (ts, num)
+			end
+
 			for _, proto in ipairs (frame_proto) do
-				-- If 'any' hook is set, execute it first...
+				-- Execute 'any' hook first...
 				if dissector.usr_hook["*"] then
 					dissector.usr_hook["*"] (proto.data, ts, num)
 				end
@@ -209,6 +222,10 @@ function dissector:run ()
 				if dissector.usr_hook[proto.name] then
 					dissector.usr_hook[proto.name] (proto.data, ts, num)
 				end
+			end
+
+			if dissector.usr_hook["$"] then
+				dissector.usr_hook["$"] (ts, num)
 			end
 		else
 			error (("parser failed: %s"):format (errmsg))
