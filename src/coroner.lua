@@ -1,5 +1,15 @@
 --- Main module.
 -- @module coroner
+
+-- Enable colors if stdout is writting to terminal.
+if _STDOUT_TYPE == "chrdev" then
+	require ("color")
+else
+	string.color = function (str)
+		return str
+	end
+end
+
 local coroner = {}
 local coroner_ver = "1.0"
 
