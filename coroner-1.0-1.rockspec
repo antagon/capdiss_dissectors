@@ -1,14 +1,14 @@
-package = "capdiss_protocols"
-version = "0.0.1-1"
+package = "coroner"
+version = "1.0-1"
 
 source = {
-	url = "git://github.com/antagon/capdiss_protocols",
-	tag = "0.0.1"
+	url = "git://github.com/antagon/coroner",
+	tag = "1.0"
 }
 
 description = {
-	summary = "Protocol dissectors for capdiss.",
-	homepage = "http://codeward.org/software/capdiss",
+	summary = "A packet dissection framework.",
+	homepage = "http://codeward.org/software/coroner",
 	maintainer = "Dan Antagon <antagon@codeward.org>",
 	license = "MIT"
 }
@@ -20,9 +20,12 @@ dependencies = {
 build = {
 	type = "builtin",
 	modules = {
-		eth = "src/eth.lua",
-		ip = "src/ip.lua",
-		tcp = "src/tcp.lua"
+		eth = "src/protocol/eth.lua",
+		icmp = "src/protocol/icmp.lua",
+		ip = "src/protocol/ip.lua",
+		ipv6 = "src/protocol/ipv6.lua",
+		tcp = "src/protocol/tcp.lua",
+		udp = "src/protocol/udp.lua"
 	}
 }
 
