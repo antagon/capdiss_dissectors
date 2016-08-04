@@ -1,4 +1,4 @@
---- Useful functions for byte string manipulation.
+--- Functions for byte string manipulation.
 -- These functions were adapted from nmap's nselib. See http://nmap.org/.
 -- @module bstr
 local bstr = {}
