@@ -1,15 +1,5 @@
 --- Main module.
 -- @module coroner
-
--- Enable colors if stdout is writting to a terminal.
-if _STDOUT_TYPE == "chrdev" then
-	require ("color")
-else
-	string.color = function (str)
-		return str
-	end
-end
-
 local coroner = {}
 local coroner_ver = "1.0"
 
@@ -50,6 +40,36 @@ end
 -- _chrdev_, _blkdev_, _fifo_, _unknown_ or **nil**.
 function coroner.get_stdout_type ()
 	return _STDOUT_TYPE
+end
+
+--- Get type of an operating system.
+-- @return One of the following values: _linux_, _windows_, _unknown_ or
+-- **nil**.
+function coroner.get_os_type ()
+	return _OS
+end
+
+--- Enable/Disable ASCII colors. On Linux, colors are enabled by default.
+function coroner.enable_colors (enable)
+	if enable then
+		require ("color")
+	else
+		-- If colors are disabled, return the original text.
+		if string then
+			string.color = function (str)
+				return str
+			end
+		end
+	end
+end
+
+-- Enable colors if stdout is redirected to a terminal.
+-- Windows terminal is not capable of displaying ASCII colors, so this feature
+-- is disabled by default.
+if coroner.get_stdout_type () == "chrdev" and coroner.get_os_type () ~= "windows" then
+	coroner.enable_colors (true)
+else
+	coroner.enable_colors (false)
 end
 
 return coroner
