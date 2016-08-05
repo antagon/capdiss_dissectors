@@ -24,9 +24,9 @@ function dissector.new ()
 end
 
 local function is_specialhook (name)
-	return name == "@" or name == "*"
+	return name == "@" or name == "."
 		or name == "^" or name == "$"
-		or name == "sigaction"
+		or name == "*" or name == "sigaction"
 end
 
 --- Set a hook table.
@@ -230,6 +230,11 @@ function dissector:run ()
 		else
 			error (("parser failed: %s"):format (errmsg))
 		end
+	end
+
+	-- Set finish hook, if it was set in a hook table.
+	if self.usr_hook["."] then
+		hooks.finish = self.usr_hook["."]
 	end
 
 	-- Set signal handler, if it was set in a hook table.
