@@ -1,12 +1,11 @@
 .PHONY: all docs clean
 
 all:
-	$(MAKE) -C src/
+	@echo "Run \`make docs\` or \`make clean\`."
 
 docs:
 	$(MAKE) -C docs/
 
 clean:
-	$(MAKE) -C src/ clean
 	$(MAKE) -C docs/ clean
 
