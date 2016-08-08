@@ -10,10 +10,6 @@ coroner.app = require ("app")
 -- @treturn table New application object.
 -- @see app.type
 function coroner.new_app (type)
-	if not _CAPDISS_VERSION then
-		error ("Sorry... Coroner Framework can only be run in capdiss environment.", 2)
-	end
-
 	return coroner.app:new (type)
 end
 
@@ -28,8 +24,7 @@ end
 -- @return Version string or **nil**.
 function coroner.capdiss_version ()
 	if _CAPDISS_VERSION then
-		local _, _, ver = string.match (_CAPDISS_VERSION, "(%d.%d.%d)$")
-		return ver
+		return string.match (_CAPDISS_VERSION, "(%d.%d.%d)$")
 	end
 
 	return nil
@@ -62,6 +57,27 @@ function coroner.enable_colors (enable)
 		end
 	end
 end
+
+local function check_compatibility (min_ver)
+	local capdiss_ver = coroner.capdiss_version ()
+
+	if not capdiss_ver then
+		error ("Coroner can run only in the capdiss environment.", 2)
+	else
+		local capdiss_major, capdiss_minor = string.match (capdiss_ver, "^(%d+).(%d+).%d+$")
+		local support_major, support_minor = string.match (min_ver, "^(%d+).(%d+).*%d*$")
+
+		if tonumber (capdiss_major) < tonumber (support_major)
+				or tonumber (capdiss_minor) < tonumber (support_minor) then
+			error (("Coroner supports capdiss version >= %d.%d (current %d.%d)"):format (
+						support_major, support_minor,
+						capdiss_major, capdiss_minor), 2)
+		end
+	end
+end
+
+-- Check compability with capdiss environment.
+check_compatibility ("0.3")
 
 -- Enable colors if stdout is redirected to a terminal.
 -- Windows terminal is not capable of displaying ASCII colors, so this feature
