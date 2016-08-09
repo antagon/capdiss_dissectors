@@ -20,6 +20,7 @@ local hooks = {
 				packet:get_daddr ():color ("brgreen", nil, true)))
 	end,
 
+	-- Match an IPv6 packet...
 	ipv6 = function (packet, ts, num)
 		print (("[%06d] %s :: %s => %s"):format (
 				num,
@@ -65,17 +66,16 @@ local hooks = {
 	-- Trigger after end of each frame...
 	["$"] = function (ts, num)
 		-- Just here to show you that I exist...
-	end,
-
-	-- A signal handler...
-	sigaction = function (signo)
-		print ("Ooops... a signal delivered...")
 	end
 }
 
 if not app:set_hooks (hooks) then
 	error (app:get_error ())
 end
+
+app:set_sigaction (function (signo)
+	print ("A signal delivered (".. signo ..")")
+end)
 
 return app:run ()
 
