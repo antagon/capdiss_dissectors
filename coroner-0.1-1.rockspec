@@ -1,9 +1,9 @@
 package = "coroner"
-version = "1.0-1"
+version = "0.1-1"
 
 source = {
 	url = "git://github.com/antagon/coroner",
-	tag = "1.0"
+	tag = "0.1"
 }
 
 description = {
