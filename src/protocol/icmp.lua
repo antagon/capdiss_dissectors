@@ -175,13 +175,39 @@ function icmp:get_seqnum ()
 	return self.icmp_seq
 end
 
---- Translate packet's type and code number to text.
--- @tparam integer type Packet type.
--- @tparam integer code Packet code.
--- @treturn string Message or nil, if combination of type and code does not exists.
+--- Convert packet's type to text representation (human readable).
+-- @treturn string Text or an empty string.
+function icmp:get_type_str ()
+	local types = {}
+
+	types[self.types.ICMP_ECHOREPLY] = "Echo reply"
+	types[self.types.ICMP_DEST_UNREACH] = "Destination unreachable"
+	types[self.types.ICMP_SOURCE_QUENCH] = "Source quench"
+	types[self.types.ICMP_REDIRECT] = "Redirect (change route)"
+	types[self.types.ICMP_ECHO] = "Echo request"
+	types[self.types.ICMP_ROUTERADVERT] = "Router advertisement"
+	types[self.types.ICMP_ROUTERSOLICIT] = "Router solicitation"
+	types[self.types.ICMP_TIME_EXCEEDED] = "Time exceeded"
+	types[self.types.ICMP_PARAMPROB] = "Parameter problem"
+	types[self.types.ICMP_TIMESTAMP] = "Timestamp request"
+	types[self.types.ICMP_TIMESTAMPREPLY] = "Timestamp reply"
+	types[self.types.ICMP_INFO_REQUEST] = "Information request"
+	types[self.types.ICMP_INFO_REPLY] = "Information reply"
+	types[self.types.ICMP_ADDRESS] = "Address Mask request"
+	types[self.types.ICMP_ADDRESSREPLY] = "Address Mask reply"
+	types[self.types.ICMP_TRACEROUTE] = "Traceroute"
+	types[self.types.ICMP_CONVERR] = "Conversion error"
+	types[self.types.ICMP_DOMAIN] = "Domain Name request"
+	types[self.types.ICMP_DOMAINREPLY] = "Domain Name reply"
+
+	return types[self.icmp_type] or ""
+end
+
+--- Convert packet's type and code number to text.
+-- @treturn string Message or an empty string, if combination of type and code does not exists.
 -- @see icmp.types
 -- @see icmp.codes
-function icmp.code_to_text (type, code)
+function icmp:get_code_str ()
 	local types = {}
 
 	types[ICMP_DEST_UNREACH][ICMP_NET_UNREACH] = "Network unreachable"
@@ -231,11 +257,11 @@ function icmp.code_to_text (type, code)
 	types[ICMP_CONVERR][ICMP_ROLLOVERMISSING] = "32-bit rollover missing and ACK set"
 	types[ICMP_CONVERR][ICMP_TRANSOPTMISSING] = "Unknown mandatory transport option present"
 
-	if types[type] then
-		return types[type][code]
+	if types[self.icmp_type] then
+		return types[self.icmp_type][self.icmp_code] or ""
 	end
 
-	return nil
+	return ""
 end
 
 --- Get last error message.
