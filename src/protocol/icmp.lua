@@ -109,6 +109,12 @@ function icmp:parse ()
 	self.icmp_code = bstr.u8 (self.buff, 1)
 	self.icmp_sum = bstr.u16 (self.buff, 2)
 
+	if self.icmp_type == self.types.ICMP_ECHOREPLY
+			or self.icmp_type == self.types.ICMP_ECHO then
+		self.icmp_id = bstr.u16 (self.buff, 4)
+		self.icmp_seq = bstr.u16 (self.buff, 6)
+	end
+
 	return true
 end
 
@@ -155,6 +161,18 @@ end
 -- @treturn integer Packet checksum.
 function icmp:get_checksum ()
 	return self.icmp_sum
+end
+
+--- Get ICMP ECHO Request/Response ID.
+-- @treturn integer ID or nil.
+function icmp:get_id ()
+	return self.icmp_id
+end
+
+--- Get ICMP ECHO Request/Response sequence number.
+-- @treturn integer Sequence number or nil.
+function icmp:get_seqnum ()
+	return self.icmp_seq
 end
 
 --- Translate packet's type and code number to text.
