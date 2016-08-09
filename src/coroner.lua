@@ -1,7 +1,7 @@
 --- Main module.
 -- @module coroner
 local coroner = {}
-local coroner_ver = "1.0"
+local coroner_ver = "0.1"
 
 coroner.app = require ("app")
 
