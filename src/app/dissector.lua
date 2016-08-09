@@ -123,15 +123,19 @@ local function parse_ip_packet (ip_obj)
 		proto_l4 = require ("protocol/icmp")
 		proto_l4_name = "icmp"
 
-	-- Encapsulated IP (tunneling)
-	elseif proto_type == ip_obj.proto.IPPROTO_IPIP then
+	-- Encapsulated IP or IPv6
+	elseif proto_type == ip_obj.proto.IPPROTO_IPIP or proto_type == ip_obj.proto.IPPROTO_IPV6 then
 		local ip_encaps = ip_obj:new (ip_obj:get_rawpacket ())
 
 		if not ip_encaps:parse () then
 			return nil, ip_encaps:get_error ()
 		end
 
-		table.insert (proto, { name = "ip", data = ip_encaps })
+		if ip_obj:get_version () == 4 then
+			table.insert (proto, { name = "ip", data = ip_encaps })
+		else
+			table.insert (proto, { name = "ipv6", data = ip_encaps })
+		end
 
 		local ip_encaps_proto, errmsg = parse_ip_packet (ip_encaps)
 
@@ -143,11 +147,7 @@ local function parse_ip_packet (ip_obj)
 	end
 
 	if proto_l4 then
-		if ip_obj:get_version () == 4 then
-			proto_l4:set_packet (ip_obj:get_rawpacket ())
-		else
-			proto_l4:set_packet (ip_obj:get_nextheader ())
-		end
+		proto_l4:set_packet (ip_obj:get_rawpacket ())
 
 		if not proto_l4:parse () then
 			return nil, proto_l4:get_error ()
