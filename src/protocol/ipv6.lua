@@ -1,4 +1,7 @@
 --- Internet protocol version 6 packet dissector.
+-- Please note, that extension headers are skipped over automatically, call to
+-- **ipv6:get_nexthdrtype** returns the first non extension header type.
+--
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
 -- @classmod ipv6
 local bit = require ("bit32")
@@ -32,10 +35,17 @@ local function raw (buff, index, length)
 end
 
 local function ip_ntop (buff)
-	return ("%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x"):format (
+	return ("%x:%x:%x:%x:%x:%x:%x:%x"):format (
 		bstr.u16 (buff, 0), bstr.u16 (buff, 2), bstr.u16 (buff, 4),
 		bstr.u16 (buff, 6), bstr.u16 (buff, 8), bstr.u16 (buff, 10),
 		bstr.u16 (buff, 12), bstr.u16 (buff, 14))
+end
+
+local function is_extensionhdr (nhdr)
+	return nhdr == ipv6.proto.IPPROTO_HOPOPT
+			or nhdr == ipv6.proto.IPPROTO_IPV6ROUTE
+			or nhdr == ipv6.proto.IPPROTO_IPV6FRAG
+			or nhdr == ipv6.proto.IPPROTO_IPV6DSTOPTS
 end
 
 --- Create a new object.
@@ -80,6 +90,12 @@ function ipv6:parse ()
 	self.ip6_hlimt = bstr.u8 (self.buff, 7)
 	self.ip6_src = raw (self.buff, 8, 16)
 	self.ip6_dst = raw (self.buff, 24, 16)
+	self.ip6_poff = 40 -- Payload offset
+
+	while is_extensionhdr (self.ip6_nhdr) do
+		self.ip6_nhdr = bstr.u8 (self.buff, self.ip6_poff)
+		self.ip6_poff = self.ip6_poff + (bstr.u8 (self.buff, self.ip6_poff + 1) * 8) + 8
+	end
 
 	return true
 end
@@ -90,11 +106,12 @@ function ipv6:type ()
 	return "ipv6"
 end
 
---- Get raw packet data uncapsulated in the IPv6 packet data.
+--- Get raw packet data uncapsulated in the IPv6 packet data. This method skips
+-- all extension headers.
 -- @treturn string Raw packet data or an empty string.
-function ipv6:get_nextheader ()
+function ipv6:get_rawpacket ()
 	if string.len (self.buff) > 40 then
-		return string.sub (self.buff, 40 + 1, -1)
+		return string.sub (self.buff, self.ip6_poff + 1, -1)
 	end
 
 	return ""
@@ -142,7 +159,7 @@ function ipv6:get_traffclass ()
 	return self.ip6_tc
 end
 
---- Get packet's Flowlabel.
+--- Get packet's flowlabel.
 -- @treturn integer Flowlabel.
 function ipv6:get_flowlabel ()
 	return self.ip6_fl
