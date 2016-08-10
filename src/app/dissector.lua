@@ -30,20 +30,29 @@ end
 
 --- Set a hook table where the key names correspond to a protocol name or a symbol.
 --
--- **@** (at sign) -- run at the beginning of each input file, before any
--- frames are processed.
+-- **@** -- run at the beginning of each input file, before any
+-- frames are processed. A name of a input file is passed as a first
+-- argument, followed by a link-type.
 --
--- **.** (dot) -- run at the end of each input file, after all frames were processed.
+-- **.** (dot) -- run at the end of each input file, after all frames were
+-- processed. No parameters are passed to this hook function.
 --
 -- **^** (caret) -- run for each frame before any packets inside the frame are
--- processed.
+-- processed. A timestamp of capture and relative frame number is passed to the
+-- hook function.
 --
--- **$** (dollar sign) -- run for each frame after all packets inside a frame
--- were processed.
+-- **$** -- run for each frame after all packets inside a frame were processed.
+-- A timestamp of capture and relative frame number is passed to the hook
+-- function.
 --
--- ***** (asterisk) -- run for any packet.
+-- ***** (asterisk) -- run for any packet. An object corresponding to one of
+-- the packet dissectors (i.e. tcp) is passed to the hook function, followed by
+-- timestamp and relative frame number.
 --
--- _protocol_ -- run for each occurence of a protocol matching the name _protocol_ (i.e. tcp).
+-- _protocol_ -- run for each occurence of a protocol matching the name
+-- _protocol_ (i.e. tcp). An object corresponding to one of the packet
+-- dissectors (i.e. tcp) is passed to the hook function, followed by timestamp
+-- and relative frame number.
 -- @tparam table hooks A key in a table is used to match a protocol name or a
 -- special hook name. The value stored in each key must be a function.
 -- @treturn boolean True on success, false on failure (error message is set).
