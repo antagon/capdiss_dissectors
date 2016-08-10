@@ -145,6 +145,7 @@ end
 --- Get packet type.
 -- @treturn integer Packet type.
 -- @see icmp.types
+-- @see icmp.get_type_str
 function icmp:get_type ()
 	return self.icmp_type
 end
@@ -152,7 +153,7 @@ end
 --- Get packet code.
 -- @treturn integer Packet code.
 -- @see icmp.codes
--- @see icmp.code_to_text
+-- @see icmp.get_code_str
 function icmp:get_code ()
 	return self.icmp_code
 end
@@ -175,8 +176,10 @@ function icmp:get_seqnum ()
 	return self.icmp_seq
 end
 
---- Convert packet's type to text representation (human readable).
+--- Convert packet's type to the text representation (human readable format).
 -- @treturn string Text or an empty string.
+-- @see icmp.types
+-- @see icmp.codes
 function icmp:get_type_str ()
 	local types = {}
 
@@ -203,7 +206,7 @@ function icmp:get_type_str ()
 	return types[self.icmp_type] or ""
 end
 
---- Convert packet's type and code number to text.
+--- Convert packet's type and code to the text representation (human readable format).
 -- @treturn string Message or an empty string, if combination of type and code does not exists.
 -- @see icmp.types
 -- @see icmp.codes
