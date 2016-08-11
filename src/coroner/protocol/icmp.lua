@@ -1,6 +1,6 @@
 --- Internet Control Message Protocol (ICMP) packet dissector.
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
--- @classmod icmp
+-- @classmod coroner.protocol.icmp
 local bstr = require ("coroner/bstr")
 local icmp = {}
 

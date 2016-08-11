@@ -1,9 +1,9 @@
 --- Intermediary application module.
--- @module app
+-- @module coroner.app
 local app = {}
 
 --- Recognized application types.
--- @see dissector
+-- @see coroner.app.dissector
 app.type = {
 	DISSECTOR = 0x01 -- Packet dissector
 }

@@ -2,6 +2,7 @@
 -- Copyright (c) william@25thandClement.com
 --
 -- See http://lua-users.org/wiki/PosixGetOpt
+-- @module coroner.getopt
 
 --- TODO...
 function getopt (optstring, args)

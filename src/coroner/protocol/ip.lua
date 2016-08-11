@@ -1,6 +1,6 @@
 --- Internet protocol version 4 packet dissector.
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
--- @classmod ip
+-- @classmod coroner.protocol.ip
 
 local bit = require ("bit32")
 local bstr = require ("coroner/bstr")

@@ -1,6 +1,6 @@
 --- User Datagram Protocol (UDP) packet dissector.
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
--- @classmod udp
+-- @classmod coroner.protocol.udp
 local bstr = require ("coroner/bstr")
 local udp = {}
 

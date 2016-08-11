@@ -1,6 +1,6 @@
 --- An extension of the default string library, providing a single function string.color.
 -- Copyright (c) 2016 Jesse Paroz (https://github.com/jparoz/string.color)
--- @module color
+-- @module coroner.color
 
 --- Recognized color names.
 -- @table colors

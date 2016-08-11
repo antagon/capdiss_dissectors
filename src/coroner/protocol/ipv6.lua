@@ -3,7 +3,7 @@
 -- **ipv6:get_nexthdrtype** returns the first non extension header type.
 --
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
--- @classmod ipv6
+-- @classmod coroner.protocol.ipv6
 local bit = require ("bit32")
 local bstr = require ("coroner/bstr")
 local ipv6 = {}

@@ -1,6 +1,6 @@
 --- Functions for byte string manipulation.
 -- These functions were adapted from nmap's nselib. See http://nmap.org/.
--- @module bstr
+-- @module coroner.bstr
 local bstr = {}
 
 --- Get an 8-bit integer at a 0-based byte offset in a byte string.

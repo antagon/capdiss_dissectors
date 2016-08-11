@@ -1,6 +1,6 @@
 --- Ethernet II frame dissector.
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
--- @classmod eth
+-- @classmod coroner.protocol.eth
 
 local bstr = require ("coroner/bstr")
 

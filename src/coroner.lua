@@ -8,7 +8,7 @@ coroner.app = require ("coroner/app")
 --- Create a new application of a given type.
 -- @tparam integer type Type of an application.
 -- @treturn table New application object.
--- @see app.type
+-- @see coroner.app.type
 function coroner.new_app (type)
 	return coroner.app:new (type)
 end

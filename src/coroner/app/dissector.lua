@@ -4,7 +4,7 @@
 -- content of a capture file, frame by frame, dissecting individual packets
 -- inside of a frame. If a hook is defined for a matching protocol or for a
 -- special symbol, the hooked function is called.
--- @classmod dissector
+-- @module coroner.app.dissector
 local dissector = {}
 
 --- A list of supported link-types.
