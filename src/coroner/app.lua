@@ -1,5 +1,5 @@
 --- Intermediary application module.
--- @module coroner.app
+-- @classmod coroner.app
 local app = {}
 
 --- Recognized application types.
