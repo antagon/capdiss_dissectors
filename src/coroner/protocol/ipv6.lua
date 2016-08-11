@@ -5,7 +5,7 @@
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
 -- @classmod ipv6
 local bit = require ("bit32")
-local bstr = require ("bstr")
+local bstr = require ("coroner/bstr")
 local ipv6 = {}
 
 --- IPv6 protocol types.

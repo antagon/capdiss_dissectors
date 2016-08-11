@@ -3,7 +3,7 @@
 local coroner = {}
 local coroner_ver = "0.1"
 
-coroner.app = require ("app")
+coroner.app = require ("coroner/app")
 
 --- Create a new application of a given type.
 -- @tparam integer type Type of an application.
@@ -47,7 +47,7 @@ end
 --- Enable/Disable ASCII colors. On Linux, colors are enabled by default.
 function coroner.enable_colors (enable)
 	if enable then
-		require ("color")
+		require ("coroner/color")
 	else
 		-- If colors are disabled, return the original text.
 		if string then

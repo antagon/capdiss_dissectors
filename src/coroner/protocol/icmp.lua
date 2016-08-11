@@ -1,7 +1,7 @@
 --- Internet Control Message Protocol (ICMP) packet dissector.
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
 -- @classmod icmp
-local bstr = require ("bstr")
+local bstr = require ("coroner/bstr")
 local icmp = {}
 
 --- ICMP message types.

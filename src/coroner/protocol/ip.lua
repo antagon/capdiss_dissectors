@@ -3,7 +3,7 @@
 -- @classmod ip
 
 local bit = require ("bit32")
-local bstr = require ("bstr")
+local bstr = require ("coroner/bstr")
 local ip = {}
 
 --- IP protocol types.

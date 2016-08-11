@@ -1,7 +1,7 @@
 --- Transmission Control Protocol (TCP) packet dissector.
 -- This module is based on code adapted from nmap's nselib. See http://nmap.org/.
 -- @classmod tcp
-local bstr = require ("bstr")
+local bstr = require ("coroner/bstr")
 local bit = require ("bit32")
 local tcp = {}
 

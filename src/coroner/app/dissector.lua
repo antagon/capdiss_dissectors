@@ -119,17 +119,17 @@ local function parse_ip_packet (ip_obj)
 
 	-- TCP
 	if proto_type == ip_obj.proto.IPPROTO_TCP then
-		proto_l4 = require ("protocol/tcp")
+		proto_l4 = require ("coroner/protocol/tcp")
 		proto_l4_name = "tcp"
 
 	-- UDP
 	elseif proto_type == ip_obj.proto.IPPROTO_UDP then
-		proto_l4 = require ("protocol/udp")
+		proto_l4 = require ("coroner/protocol/udp")
 		proto_l4_name = "udp"
 
 	-- ICMP
 	elseif proto_type == ip_obj.proto.IPPROTO_ICMP then
-		proto_l4 = require ("protocol/icmp")
+		proto_l4 = require ("coroner/protocol/icmp")
 		proto_l4_name = "icmp"
 
 	-- Encapsulated IP or IPv6
@@ -169,7 +169,7 @@ local function parse_ip_packet (ip_obj)
 end
 
 local function parse_eth_frame (frame)
-	local eth = require ("protocol/eth")
+	local eth = require ("coroner/protocol/eth")
 	local proto = {}
 
 	eth:set_frame (frame)
@@ -184,10 +184,10 @@ local function parse_eth_frame (frame)
 	local proto_l3_name = ""
 
 	if eth:get_ethertype () == eth.ethertype.ETHERTYPE_IP then
-		proto_l3 = require ("protocol/ip")
+		proto_l3 = require ("coroner/protocol/ip")
 		proto_l3_name = "ip"
 	elseif eth:get_ethertype () == eth.ethertype.ETHERTYPE_IPV6 then
-		proto_l3 = require ("protocol/ipv6")
+		proto_l3 = require ("coroner/protocol/ipv6")
 		proto_l3_name = "ipv6"
 	end
 

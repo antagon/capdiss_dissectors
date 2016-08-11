@@ -16,7 +16,7 @@ function app:new (type)
 	local app_new = nil
 
 	if type == app.type.DISSECTOR then
-		app_new = require ("app/dissector")
+		app_new = require ("coroner/app/dissector")
 	else
 		error ("unrecognized application type", 2)
 	end
