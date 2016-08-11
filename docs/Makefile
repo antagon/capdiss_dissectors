@@ -4,5 +4,5 @@ all:
 	ldoc -c ./config.ld ../src/
 
 clean:
-	rm -rf *.html *.css ./modules/
+	rm -rf *.html *.css ./modules/ ./classes/ ./examples/
 
