@@ -19,13 +19,14 @@ dissector.proto = {
 	ipv6 = true, -- Internet protocol version 6
 	tcp = true,  -- Transmission Control Protocol (TCP)
 	udp = true,  -- User Datagram Protocol (UDP)
-	icmp = true  -- Internet Control Message Protocol (ICMP)
+	icmp = true, -- Internet Control Message Protocol (ICMP)
+	http = true, -- Hypertext Transfer Protocol (HTTP)
 }
 
 local function is_specialhook (name)
 	return name == "@" or name == "."
 		or name == "^" or name == "$"
-		or name == "*"
+		or name == "*" or name == "?"
 end
 
 --- Set a hook table where the key names correspond to a protocol name or a symbol.
@@ -47,7 +48,11 @@ end
 --
 -- ***** (asterisk) -- run for any packet. An object corresponding to one of
 -- the packet dissectors (i.e. tcp) is passed to the hook function, followed by
--- timestamp and relative frame number.
+-- frame timestamp and relative frame number.
+--
+-- **?** -- run for any packet that has no corresponding dissector. Callback
+-- function expects three parameters: _packet_ object (special dummy
+-- dissector), frame timestamp and relative frame number.
 --
 -- _protocol_ -- run for each occurence of a protocol matching the name
 -- _protocol_ (i.e. tcp). An object corresponding to one of the packet
@@ -102,6 +107,36 @@ local function merge_tables (t1, t2)
 	return t1
 end
 
+local function src_or_dst_port (obj, port)
+	return obj:get_srcport () == port or obj:get_dstport () == port
+end
+
+local function parse_tcp_packet (tcp_obj)
+	local proto = {}
+	local proto_l7 = nil
+
+	-- HTTP
+	if src_or_dst_port (tcp_obj, 80) then
+		proto_l7 = require ("coroner/protocol/http")
+	else
+		proto_l7 = require ("coroner/protocol/dummy")
+	end
+
+	if proto_l7 then
+		proto_l7:set_packet (tcp_obj:get_data ())
+
+		if proto_l7:parse () then
+			table.insert (proto, { name = proto_l7:type (), data = proto_l7 })
+		end
+	end
+
+	return proto
+end
+
+local function parse_udp_packet (udp_obj)
+	return {}
+end
+
 local function parse_ip_packet (ip_obj)
 	local proto_type = nil
 	local proto = {}
@@ -115,22 +150,18 @@ local function parse_ip_packet (ip_obj)
 	end
 
 	local proto_l4 = nil
-	local proto_l4_name = ""
 
 	-- TCP
 	if proto_type == ip_obj.proto.IPPROTO_TCP then
 		proto_l4 = require ("coroner/protocol/tcp")
-		proto_l4_name = "tcp"
 
 	-- UDP
 	elseif proto_type == ip_obj.proto.IPPROTO_UDP then
 		proto_l4 = require ("coroner/protocol/udp")
-		proto_l4_name = "udp"
 
 	-- ICMP
 	elseif proto_type == ip_obj.proto.IPPROTO_ICMP then
 		proto_l4 = require ("coroner/protocol/icmp")
-		proto_l4_name = "icmp"
 
 	-- Encapsulated IP or IPv6
 	elseif proto_type == ip_obj.proto.IPPROTO_IPIP or proto_type == ip_obj.proto.IPPROTO_IPV6 then
@@ -140,11 +171,7 @@ local function parse_ip_packet (ip_obj)
 			return nil, ip_encaps:get_error ()
 		end
 
-		if ip_obj:get_version () == 4 then
-			table.insert (proto, { name = "ip", data = ip_encaps })
-		else
-			table.insert (proto, { name = "ipv6", data = ip_encaps })
-		end
+		table.insert (proto, { name = ip_obj:type (), data = ip_encaps })
 
 		local ip_encaps_proto, errmsg = parse_ip_packet (ip_encaps)
 
@@ -153,6 +180,8 @@ local function parse_ip_packet (ip_obj)
 		end
 
 		merge_tables (proto, ip_encaps_proto)
+	else
+		proto_l4 = require ("coroner/protocol/dummy")
 	end
 
 	if proto_l4 then
@@ -162,7 +191,22 @@ local function parse_ip_packet (ip_obj)
 			return nil, proto_l4:get_error ()
 		end
 
-		table.insert (proto, { name = proto_l4_name, data = proto_l4 })
+		table.insert (proto, { name = proto_l4:type (), data = proto_l4 })
+
+		local proto_l7 = {}
+		local errmsg = ""
+
+		if proto_l4:type () == "tcp" and proto_l4:get_datalen () > 0 then
+			proto_l7, errmsg = parse_tcp_packet (proto_l4)
+		elseif proto_l4:type () == "udp" and proto_l4:get_datalen () > 0 then
+			proto_l7, errmsg = parse_udp_packet (proto_l4)
+		end
+
+		if not proto_l7 then
+			return nil, errmsg
+		end
+
+		merge_tables (proto, proto_l7)
 	end
 
 	return proto
@@ -181,14 +225,13 @@ local function parse_eth_frame (frame)
 	table.insert (proto, { name = "eth", data = eth })
 
 	local proto_l3 = nil
-	local proto_l3_name = ""
 
 	if eth:get_ethertype () == eth.ethertype.ETHERTYPE_IP then
 		proto_l3 = require ("coroner/protocol/ip")
-		proto_l3_name = "ip"
 	elseif eth:get_ethertype () == eth.ethertype.ETHERTYPE_IPV6 then
 		proto_l3 = require ("coroner/protocol/ipv6")
-		proto_l3_name = "ipv6"
+	else
+		proto_l3 = require ("coroner/protocol/dummy")
 	end
 
 	if proto_l3 then
@@ -198,7 +241,9 @@ local function parse_eth_frame (frame)
 			return nil, ip:get_error ()
 		end
 
-		table.insert (proto, { name = proto_l3_name, data = proto_l3 })
+		table.insert (proto, { name = proto_l3:type (), data = proto_l3 })
+
+		local proto_l3_name = proto_l3:type ()
 
 		if proto_l3_name == "ip" or proto_l3_name == "ipv6" then
 			local ip_proto, errmsg = parse_ip_packet (proto_l3)
