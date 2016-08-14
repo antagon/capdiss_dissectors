@@ -139,6 +139,10 @@ end
 --- Change or set new packet data.
 -- @tparam string packet byte string of packet data
 function icmp:set_packet (packet)
+	if type (packet) ~= "string" then
+		error ("parameter 'packet' is not a string", 2)
+	end
+
 	self.buff = packet
 end
 
