@@ -1,0 +1,40 @@
+package = "coroner"
+version = "0.1-1"
+
+source = {
+	url = "https://codeward.org/software/coroner/files/" .. package .. "-" .. version .. ".tar.gz",
+	md5 = "@MD5_SUM@",
+	dir = package .. "-" .. version
+}
+
+description = {
+	summary = "A packet dissection framework.",
+	homepage = "https://codeward.org/software/coroner/",
+	maintainer = "Dan Antagon <antagon@codeward.org>",
+	license = "GPLv2"
+}
+
+dependencies = {
+	"lua >= 5.2"
+}
+
+build = {
+	type = "builtin",
+	modules = {
+		["coroner"] = "src/coroner.lua",
+		["coroner.app"] = "src/coroner/app.lua",
+		["coroner.bstr"] = "src/coroner/bstr.lua",
+		["coroner.getopt"] = "src/coroner/getopt.lua",
+		["coroner.color"] = "src/coroner/color.lua",
+		["coroner.app.dissector"] = "src/coroner/app/dissector.lua",
+		["coroner.protocol.eth"] = "src/coroner/protocol/eth.lua",
+		["coroner.protocol.icmp"] = "src/coroner/protocol/icmp.lua",
+		["coroner.protocol.ip"] = "src/coroner/protocol/ip.lua",
+		["coroner.protocol.dummy"] = "src/coroner/protocol/dummy.lua",
+		["coroner.protocol.http"] = "src/coroner/protocol/http.lua",
+		["coroner.protocol.ipv6"] = "src/coroner/protocol/ipv6.lua",
+		["coroner.protocol.tcp"] = "src/coroner/protocol/tcp.lua",
+		["coroner.protocol.udp"] = "src/coroner/protocol/udp.lua"
+	}
+}
+
