@@ -1,4 +1,4 @@
---- Dummy protocol.
+--- Dummy protocol dissector.
 -- This class serves as a dummy class for protocols, for which there is no
 -- dissector available.
 -- @classmod coroner.protocol.dummy
