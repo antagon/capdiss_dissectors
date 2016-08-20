@@ -21,20 +21,20 @@ dependencies = {
 build = {
 	type = "builtin",
 	modules = {
-		["coroner"] = "src/coroner.lua",
-		["coroner.app"] = "src/coroner/app.lua",
-		["coroner.bstr"] = "src/coroner/bstr.lua",
-		["coroner.getopt"] = "src/coroner/getopt.lua",
-		["coroner.color"] = "src/coroner/color.lua",
-		["coroner.app.dissector"] = "src/coroner/app/dissector.lua",
-		["coroner.protocol.eth"] = "src/coroner/protocol/eth.lua",
-		["coroner.protocol.icmp"] = "src/coroner/protocol/icmp.lua",
-		["coroner.protocol.ip"] = "src/coroner/protocol/ip.lua",
-		["coroner.protocol.dummy"] = "src/coroner/protocol/dummy.lua",
-		["coroner.protocol.http"] = "src/coroner/protocol/http.lua",
-		["coroner.protocol.ipv6"] = "src/coroner/protocol/ipv6.lua",
-		["coroner.protocol.tcp"] = "src/coroner/protocol/tcp.lua",
-		["coroner.protocol.udp"] = "src/coroner/protocol/udp.lua"
+		["coroner"] = "coroner.lua",
+		["coroner.app"] = "coroner/app.lua",
+		["coroner.bstr"] = "coroner/bstr.lua",
+		["coroner.getopt"] = "coroner/getopt.lua",
+		["coroner.color"] = "coroner/color.lua",
+		["coroner.app.dissector"] = "coroner/app/dissector.lua",
+		["coroner.protocol.eth"] = "coroner/protocol/eth.lua",
+		["coroner.protocol.icmp"] = "coroner/protocol/icmp.lua",
+		["coroner.protocol.ip"] = "coroner/protocol/ip.lua",
+		["coroner.protocol.dummy"] = "coroner/protocol/dummy.lua",
+		["coroner.protocol.http"] = "coroner/protocol/http.lua",
+		["coroner.protocol.ipv6"] = "coroner/protocol/ipv6.lua",
+		["coroner.protocol.tcp"] = "coroner/protocol/tcp.lua",
+		["coroner.protocol.udp"] = "coroner/protocol/udp.lua"
 	}
 }
 
