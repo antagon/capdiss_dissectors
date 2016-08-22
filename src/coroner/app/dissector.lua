@@ -19,8 +19,7 @@ dissector.proto = {
 	ipv6 = true, -- Internet protocol version 6
 	tcp = true,  -- Transmission Control Protocol (TCP)
 	udp = true,  -- User Datagram Protocol (UDP)
-	icmp = true, -- Internet Control Message Protocol (ICMP)
-	http = true, -- Hypertext Transfer Protocol (HTTP)
+	icmp = true  -- Internet Control Message Protocol (ICMP)
 }
 
 local function is_specialhook (name)
@@ -111,32 +110,6 @@ local function src_or_dst_port (obj, port)
 	return obj:get_srcport () == port or obj:get_dstport () == port
 end
 
-local function parse_tcp_packet (tcp_obj)
-	local proto = {}
-	local proto_l7 = nil
-
-	-- HTTP
-	if src_or_dst_port (tcp_obj, 80) then
-		proto_l7 = require ("coroner/protocol/http")
-	else
-		proto_l7 = require ("coroner/protocol/dummy")
-	end
-
-	if proto_l7 then
-		proto_l7:set_packet (tcp_obj:get_data ())
-
-		if proto_l7:parse () then
-			table.insert (proto, { name = proto_l7:type (), data = proto_l7 })
-		end
-	end
-
-	return proto
-end
-
-local function parse_udp_packet (udp_obj)
-	return {}
-end
-
 local function parse_ip_packet (ip_obj)
 	local proto_type = nil
 	local proto = {}
@@ -192,21 +165,6 @@ local function parse_ip_packet (ip_obj)
 		end
 
 		table.insert (proto, { name = proto_l4:type (), data = proto_l4 })
-
-		local proto_l7 = {}
-		local errmsg = ""
-
-		if proto_l4:type () == "tcp" and proto_l4:get_datalen () > 0 then
-			proto_l7, errmsg = parse_tcp_packet (proto_l4)
-		elseif proto_l4:type () == "udp" and proto_l4:get_datalen () > 0 then
-			proto_l7, errmsg = parse_udp_packet (proto_l4)
-		end
-
-		if not proto_l7 then
-			return nil, errmsg
-		end
-
-		merge_tables (proto, proto_l7)
 	end
 
 	return proto
