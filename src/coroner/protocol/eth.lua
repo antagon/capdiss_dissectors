@@ -115,6 +115,18 @@ function eth:get_rawdaddr ()
 	return self.mac_dst
 end
 
+--- Get frame's length.
+-- @treturn integer Frame length.
+function eth:get_length ()
+	return #self.buff - 14
+end
+
+--- Get frame's header length.
+-- @treturn integer Header length.
+function eth:get_hdrlen ()
+	return 14
+end
+
 --- Get last error message.
 -- @treturn string Error message.
 function eth:get_error ()
